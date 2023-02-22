@@ -8,13 +8,22 @@ import {
   Heading,
   Input,
   Button,
+  Spinner,
   PlayIcon,
 } from 'native-base';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import BotBubble from '../components/BotBubble';
 import UserBubble from '../components/UserBubble';
+import {signInWithGoogle} from '../services/firebase';
+import * as BotQuestions from '../Bot/leave.json';
 const Home = () => {
   const [inputText, setInputText] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
   const [chats, setChats] = React.useState([]);
+
+  React.useEffect(() => {
+    console.log(BotQuestions);
+  }, []);
   return (
     <VStack style={{flex: 1}}>
       <HStack p={5} alignItems={'center'}>
@@ -44,7 +53,26 @@ const Home = () => {
           borderTopRightRadius={'3xl'}
           background={'white'}>
           <HStack flex={1} space={2}>
-            <Button flex={1}>Sign In</Button>
+            <Button
+              disabled={loading}
+              variant={loading ? 'ghost' : 'solid'}
+              onPress={() => {
+                setLoading(true);
+                // signInWithGoogle();
+                setTimeout(() => {
+                  setLoading(false);
+                }, 2000);
+              }}
+              flex={1}
+              startIcon={
+                loading ? (
+                  <Spinner size={17} />
+                ) : (
+                  <Icon name="google" size={15} color={'white'} />
+                )
+              }>
+              {loading ? null : 'Sign In'}
+            </Button>
             {/* <Input
               onChange={e => {
                 console.log(e.value);

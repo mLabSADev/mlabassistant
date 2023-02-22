@@ -1,124 +1,116 @@
 {
-    "start": "greeting",
-    "greeting": {
-        "type": "options",
-        "content": "How can I help you today?",
-        "next": "",
-        "options": [
-            {
-                "text": "Sick Leave",
-                "next": "sickLeave"
-            },
-            {
-                "text": "Taking Leave days",
-                "next": "numberOfLeaveDaysTaken"
-            },
-            {
-                "text": "Family responsibility Leave",
-                "next": "familyResponsibility"
-            }
-        ]
-    },
-    "sickLeave": {
-        "type": "question",
-        "content": "Please explain why you are taking sick leave ",
-        "fieldType": "text",
-        "next": "sickLeaveCertificate"
-    },
-    "takingLeaveDays": {
-        "type": "question",
-        "content": "Sorry we currently don't offer that but it's Coming soon? ",
+  "start": "greeting",
+  "greeting": {
+    "type": "options",
+    "content": "How can I help you today?",
+    "next": "",
+    "options": [
+      {
+        "text": "Sick Leave",
+        "next": "sickLeave"
+      },
+      {
+        "text": "Taking Leave days",
         "next": "numberOfLeaveDaysTaken"
-    },
-    "familyResponsibility": {
-        "type": "question",
-        "content": "Please explain why you are taking emergency leave ",
-        "fieldType": "text",
-        "next": "numberOfLeaveDaysTaken"
-    },
+      },
+      {
+        "text": "Family responsibility Leave",
+        "next": "familyResponsibility"
+      }
+    ]
+  },
+  "sickLeave": {
+    "type": "question",
+    "content": "Please explain why you are taking sick leave ",
+    "fieldType": "text",
+    "next": "sickLeaveCertificate"
+  },
+  "takingLeaveDays": {
+    "type": "question",
+    "content": "Sorry we currently don't offer that but it's Coming soon? ",
+    "next": "numberOfLeaveDaysTaken"
+  },
+  "familyResponsibility": {
+    "type": "question",
+    "content": "Please explain why you are taking emergency leave ",
+    "fieldType": "text",
+    "next": "numberOfLeaveDaysTaken"
+  },
 
-    "sickLeaveCertificate": {
-        "type": "options",
-        "content": " If you are sick for more than 2 days, you must attach a sick certificate. Were you sick for more than 2 days ",
-        "next": "",
-        "options": [
-            {
-                "text": "Yes",
-                "next": "sickLeaveUploadOptional"
-            },
-            {
-                "text": "No",
-                "next": "continue"
-            }
-        ]
-    },
-
-    "numberOfLeaveDaysTaken": {
-        "type": "question",
-        "content": "How many days are you taking?",
-        "fieldType": "phone",
-        "next": "startLeaveDay"
-    },
-    "startLeaveDay": {
-        "type": "question",
-        "content": "Starting on which date?",
-        "fieldType": "date",
-        "next": "endingLeaveDay"
-    },
-    "endingLeaveDay": {
-        "type": "question",
-        "content": "Ending on which date?",
-        "fieldType": "date",
+  "sickLeaveCertificate": {
+    "type": "options",
+    "content": " If you are sick for more than 2 days, you must attach a sick certificate. Were you sick for more than 2 days ",
+    "next": "",
+    "options": [
+      {
+        "text": "Yes",
+        "next": "sickLeaveUploadOptional"
+      },
+      {
+        "text": "No",
         "next": "continue"
-    },
+      }
+    ]
+  },
 
+  "numberOfLeaveDaysTaken": {
+    "type": "question",
+    "content": "How many days are you taking?",
+    "fieldType": "phone",
+    "next": "startLeaveDay"
+  },
+  "startLeaveDay": {
+    "type": "question",
+    "content": "Starting on which date?",
+    "fieldType": "date",
+    "next": "endingLeaveDay"
+  },
+  "endingLeaveDay": {
+    "type": "question",
+    "content": "Ending on which date?",
+    "fieldType": "date",
+    "next": "continue"
+  },
 
+  "sickLeaveUploadOptional": {
+    "type": "options",
+    "content": "Please take a picture or upload you leave document",
+    "next": "",
+    "options": [
+      {
+        "text": "Take Picture",
+        "next": "takePicture"
+      },
+      {
+        "text": "Upload",
+        "next": "upload"
+      }
+    ]
+  },
+  "takePicture": {
+    "type": "question",
+    "content": "Please take a picture of your receipt.",
+    "fieldType": "camera",
+    "next": "numberOfLeaveDaysTaken"
+  },
+  "upload": {
+    "type": "question",
+    "content": "Please upload your document.",
+    "fieldType": "camera",
+    "next": "numberOfLeaveDaysTaken"
+  },
 
-
-
-    "sickLeaveUploadOptional": {
-        "type": "options",
-        "content": "Please take a picture or upload you leave document",
-        "next": "",
-        "options": [
-            {
-                "text": "Take Picture",
-                "next": "takePicture"
-            },
-            {
-                "text": "Upload",
-                "next": "upload"
-            }
-        ]
-    },
-    "takePicture": {
-        "type": "question",
-        "content": "Please take a picture of your receipt.",
-        "fieldType": "camera",
-        "next": "numberOfLeaveDaysTaken"
-    },
-    "upload": {
-        "type": "question",
-        "content": "Please upload your document.",
-        "fieldType": "camera",
-        "next": "numberOfLeaveDaysTaken"
-    },
-
-
-
-
-
-    "continue": {
-        "type": "options",
-        "content": "Thank you for applying for Leave press 'Continue' to save the changes on your Leave form'",
-        "options": [
-            {
-                "text": "Continue",
-                "next": "finish"
-            }
-        ]
-    },
-    "finish": {
-        "type": "action"
-    }
+  "continue": {
+    "type": "options",
+    "content": "Thank you for applying for Leave press 'Continue' to save the changes on your Leave form'",
+    "options": [
+      {
+        "text": "Continue",
+        "next": "finish"
+      }
+    ]
+  },
+  "finish": {
+    "type": "action"
+  }
 }
