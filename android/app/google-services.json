@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "850465646909",
+    "project_id": "mlab-assistant",
+    "storage_bucket": "mlab-assistant.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850465646909:android:543d7764831aeb262fbd54",
+        "android_client_info": {
+          "package_name": "com.mlabassistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "850465646909-b7msm2qp92mh5lqdjbfipshn848mpfb5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mlabassistant",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "850465646909-2cfodnp5aquup07hi3kdiblasrr97bqg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkFike3G3ryrBbxifzAYGPNsYjjT1MGfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "850465646909-2cfodnp5aquup07hi3kdiblasrr97bqg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
