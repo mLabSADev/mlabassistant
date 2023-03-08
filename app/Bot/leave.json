@@ -1,5 +1,16 @@
 {
-  "start": "greeting",
+  "start": "signin",
+  "signin": {
+    "type": "options",
+    "content": "Please Signin to continue",
+    "next": "",
+    "options": [
+      {
+        "text": "Signin",
+        "next": "greeting"
+      }
+    ]
+  },
   "greeting": {
     "type": "options",
     "content": "How can I help you today?",

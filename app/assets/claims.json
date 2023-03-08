@@ -45,7 +45,7 @@
   },
   "receiptUploadOptional": {
     "type": "options",
-    "content": "Please upload your receipt ?",
+    "content": "Please upload your receipt?",
     "next": "",
     "options": [
       {
@@ -84,7 +84,7 @@
 
   "uberBolt": {
     "type": "question",
-    "content": "Please upload your Uber/Bolt Invoive.",
+    "content": "Please upload your Uber/Bolt Invoice.",
     "fieldType": "camera",
     "next": "dateOfTravel"
   },

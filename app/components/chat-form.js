@@ -11,7 +11,7 @@ import {
   Picker,
   Avatar,
   Divider,
-  ScrollView,
+  Image,
 } from 'native-base';
 import {Formik} from 'formik';
 import {
@@ -19,6 +19,7 @@ import {
   PermissionsAndroid,
   ImageBackground,
   Alert,
+  ScrollView,
 } from 'react-native';
 
 import moment from 'moment';
@@ -83,7 +84,7 @@ export const PickerDate = ({value, onChangeTime}) => {
   const [time, setTime] = useState(value && value.length == 5 ? value : '');
 
   const dateConfirmed = date => {
-    const selectedTime = moment(date).format('DD/MM/YYYY');
+    const selectedTime = moment(date).format('ddd, Do MMM');
     setTime(selectedTime);
     setShowDatePicker(false);
 
@@ -97,7 +98,12 @@ export const PickerDate = ({value, onChangeTime}) => {
   };
 
   return (
-    <View style={{paddingLeft: 20, flex: 1}}>
+    <Box
+      style={{paddingLeft: 20, flex: 1}}
+      borderColor={'gray.200'}
+      bg={'gray.100'}
+      borderWidth={1}
+      rounded={'3xl'}>
       <DateTimePicker
         testID="dateTimePicker"
         isVisible={showDatePicker}
@@ -111,16 +117,17 @@ export const PickerDate = ({value, onChangeTime}) => {
         androidMode={'default'}
       />
       <TouchableOpacity
+        style={{flex: 1, justifyContent: 'center'}}
         onPress={() => {
           setShowDatePicker(true);
         }}>
         {time ? (
-          <Text>{time}</Text>
+          <Text color={'black'}>{time}</Text>
         ) : (
           <Text style={{color: '#a0a0a0'}}>Select Date</Text>
         )}
       </TouchableOpacity>
-    </View>
+    </Box>
   );
 };
 export const LoadChatBubble = ({}) => {
@@ -176,7 +183,7 @@ const ChatForm = ({
   const [picturePicker, setpicturePicker] = useState();
   const [isFocusedCliked, setisFocusedCliked] = useState(false);
   const [messagesEdit, setMessagesEdit] = useState(false);
-  const inputStyle = {paddingLeft: 20, paddingRight: 20, color: 'black'};
+  let scrollViewRef;
 
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
@@ -312,7 +319,6 @@ const ChatForm = ({
     } else {
       sendMessage(message.content, true, key);
     }
-    return;
 
     if (message.fieldType === 'dropdown') {
       const dropdownResult = onDropdownList(key, {sendMessage, nextMessage});
@@ -383,10 +389,11 @@ const ChatForm = ({
   const loadChatBubbleOnpress = next => {
     setshowloadchatbubble(true);
     setTimeout(() => {
-      setshowloadchatbubble(false);
       nextMessage(next);
+      setshowloadchatbubble(false);
     }, 900);
   };
+
   // Get location
   const getLocation = async () => {
     setisFocusedCliked(true);
@@ -581,77 +588,84 @@ const ChatForm = ({
     const radius = 20;
     return (
       <VStack
+        space={2}
+        alignSelf={received ? 'flex-start' : 'flex-end'}
+        alignItems={'center'}
         style={{
           paddingBottom: 10,
-          alignItems: received ? 'flex-start' : 'flex-end',
           flexDirection: received ? 'column' : 'row-reverse',
         }}>
         <HStack
           bg={received ? ThemeColors.brandSecondary : ThemeColors.brandPrimary}
           borderWidth={received ? 0 : 1}
-          px={3}
-          rounded={'3xl'}
-          shadow={'3'}
+          p={1}
+          space={0}
+          rounded={20}
+          // shadow={'3'}
+          // alignItems={'center'}
           maxW={'90%'}
           style={{
-            borderBottomLeftRadius: received ? 0 : radius,
-            borderBottomRightRadius: received ? radius : 0,
+            // borderBottomLeftRadius: received ? 0 : radius,
+            // borderBottomRightRadius: received ? radius : 0,
             flexDirection: received ? 'row' : 'row-reverse',
-            alignItems: received ? 'flex-start' : 'center',
+            // alignItems: received ? 'flex-start' : 'center',
           }}>
           {/* Thumbanils on chat bubbles */}
           {/* Switches between user and bot avatar */}
           {received ? (
             <Avatar
-              size={0}
+              size={'sm'}
               alt={'avatar'}
               source={require('../assets/bot-avatar.jpg')}
             />
           ) : (
             <Avatar
-              size={'md'}
+              size={'sm'}
               alt={''}
               source={
                 profile.profilePicture
                   ? {uri: profile.profilePicture}
-                  : require('../assets/profilepic.png')
+                  : {
+                      uri: 'https://res.cloudinary.com/practicaldev/image/fetch/s--uFcwVGC1--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/27jpnicrgz7wztex78k4.jpg',
+                    }
               }
             />
           )}
 
           {/* Text / media rendered on chatbubble for both user and chatbot*/}
-          <View style={{overflow: 'hidden'}}>
+          <HStack>
             {isImage ? (
-              <Avatar source={{uri: children}} resizeMode="cover" />
-            ) : null}
-            {isImage ? null : (
+              <Box w={150} h={200}>
+                <Image
+                  flex={1}
+                  rounded={'2xl'}
+                  resizeMode={'cover'}
+                  source={{uri: children}}
+                  alt={'image'}
+                />
+                {/* <Avatar source={{uri: children}} resizeMode="cover" /> */}
+              </Box>
+            ) : (
               <VStack justifyContent={'center'} p={2}>
-                <Text fontSize={16}>{children} </Text>
+                <Text lineHeight={20} fontSize={16}>
+                  {children}
+                </Text>
               </VStack>
             )}
-          </View>
+          </HStack>
         </HStack>
 
         {/* edit */}
         {!received ? (
-          <TouchableOpacity
+          <Button
+            mx={2}
+            bg={'blueGray.100'}
+            variant={'subtle'}
             onPress={() => {
               EditPrevChat(chatBubbleIndex);
             }}
-            style={{alignSelf: 'center', alignItems: 'center'}}>
-            <View
-              style={{
-                borderRadius: 100,
-                borderWidth: 2,
-                borderColor: 'black',
-                margin: 10,
-                padding: 3,
-                alignSelf: 'center',
-                alignItems: 'center',
-              }}>
-              <Icon name="pencil" size={20} color={'black'} />
-            </View>
-          </TouchableOpacity>
+            size={10}
+            endIcon={<Icon name="pencil" size={20} color={'gray'} />}></Button>
         ) : null}
       </VStack>
     );
@@ -693,7 +707,18 @@ const ChatForm = ({
       bg={ThemeColors.brandLight}
       borderTopLeftRadius={30}
       borderTopRightRadius={30}>
-      <ScrollView>
+      <ScrollView
+        ref={ref => {
+          scrollViewRef = ref;
+          console.log('/n +++++++' + scrollViewRef + '++++++++++');
+        }}
+        // contentContainerStyle={{padding: 10}}
+        // onContentSizeChange={() => {
+        //   if (scrollViewRef) {
+        //     scrollViewRef.scrollToEnd({animated: true});
+        //   }
+        // }}
+      >
         <VStack flex={1} py={5} ref={c => (content = c)}>
           {/* Shows chats */}
           {/* can render inputs */}
@@ -792,7 +817,7 @@ const ChatForm = ({
                     <VStack
                       rounded={'3xl'}
                       style={{
-                        backgroundColor: '#efefef',
+                        // backgroundColor: '#efefef',
                         flex: 1,
                         borderColor: 'transparent',
                         marginRight: 10,
@@ -802,11 +827,16 @@ const ChatForm = ({
                       {/* text */}
                       {currentMessage.fieldType === 'text' && (
                         <Input
+                          flex={1}
+                          borderColor={'gray.200'}
+                          bg={'gray.100'}
+                          color={'gray.800'}
+                          fontSize={16}
+                          color={'gray.800'}
                           value={values.text}
                           onBlur={handleBlur('text')}
                           onChangeText={handleChange('text')}
-                          style={inputStyle}
-                          placeholder="Input Text"
+                          placeholder="Reply..."
                           placeholderTextColor="#c0c0c0"
                         />
                       )}
@@ -814,12 +844,16 @@ const ChatForm = ({
                       {/* phone */}
                       {currentMessage.fieldType === 'phone' && (
                         <Input
+                          flex={1}
+                          borderColor={'gray.200'}
+                          bg={'gray.100'}
+                          fontSize={16}
+                          color={'gray.800'}
                           keyboardType="phone-pad"
                           value={values.text}
                           onBlur={handleBlur('text')}
                           onChangeText={handleChange('text')}
-                          style={inputStyle}
-                          placeholder="Input Text"
+                          placeholder="Reply..."
                           placeholderTextColor="#c0c0c0"
                         />
                       )}
@@ -827,12 +861,16 @@ const ChatForm = ({
                       {/* number */}
                       {currentMessage.fieldType === 'number' && (
                         <Input
+                          flex={1}
+                          borderColor={'gray.200'}
+                          bg={'gray.100'}
+                          fontSize={16}
+                          color={'gray.800'}
                           keyboardType="decimal-pad"
                           value={values.text}
                           onBlur={handleBlur('text')}
                           onChangeText={handleChange('text')}
-                          style={inputStyle}
-                          placeholder="Input Text"
+                          placeholder="Reply..."
                           placeholderTextColor="#c0c0c0"
                         />
                       )}
@@ -879,7 +917,7 @@ const ChatForm = ({
                     </VStack>
                   ) : (
                     <HStack flex={1}>
-                      <Input
+                      {/* <Input
                         flex={1}
                         rounded={'3xl'}
                         borderColor={'gray.200'}
@@ -887,7 +925,7 @@ const ChatForm = ({
                         style={inputStyle}
                         placeholder="Input Text"
                         placeholderTextColor="#c0c0c0"
-                      />
+                      /> */}
                     </HStack>
                   )}
 

@@ -8,6 +8,7 @@ import {
   Button,
   HStack,
   Heading,
+  Avatar,
 } from 'native-base';
 import {
   TouchableOpacity,
@@ -57,7 +58,7 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
   };
 
   return (
-    <VStack flex={1}>
+    <KeyboardAvoidingView style={{flex: 1}}>
       <VStack flex={1}>
         <Box flex={1} p={3}>
           <HStack
@@ -68,9 +69,16 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
             rounded={'3xl'}
             alignItems={'center'}
             space={4}>
-            <Heading fontSize={24} flex={1} fontWeight={'bold'} color={'black'}>
-              {ChatBotName.name}
-            </Heading>
+            <Avatar source={require('../assets/bot-avatar.jpg')} />
+            <Box flex={1}>
+              <Text fontSize={24} m={0} fontWeight={'bold'} color={'black'}>
+                {ChatBotName.name}
+              </Text>
+              <Text color={'green.200'} m={0}>
+                Online
+              </Text>
+            </Box>
+
             <Text color={'black'}>Applying for leave</Text>
           </HStack>
 
@@ -112,7 +120,7 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
           />
         </Box>
       </VStack>
-    </VStack>
+    </KeyboardAvoidingView>
   );
 };
 

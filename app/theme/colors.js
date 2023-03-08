@@ -33,6 +33,13 @@ export const NativeBaseTheme = extendTheme({
     Button: {
       baseStyle: {
         rounded: '3xl',
+        borderColor: 'gray.100',
+      },
+    },
+    Input: {
+      baseStyle: {
+        rounded: '3xl',
+        fontSize: 16,
       },
     },
   },
