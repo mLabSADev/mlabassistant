@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const storeToken = async (value) => {
+// local storate functions
+
+export const storeToken = async value => {
   try {
     await AsyncStorage.setItem('storeTokenLocal', value);
   } catch (e) {
@@ -30,7 +32,7 @@ export const storeTokenDelete = async () => {
   console.log('Done.');
 };
 
-export const storeUIDLocal = async (value) => {
+export const storeUIDLocal = async value => {
   try {
     await AsyncStorage.setItem('storeUIDLocal', value);
   } catch (e) {
@@ -49,7 +51,7 @@ export const getStoreUIDLocal = async () => {
   }
 };
 
-export const storeNumberdaysInApp = async (value) => {
+export const storeNumberdaysInApp = async value => {
   try {
     await AsyncStorage.setItem('storeNumberdaysInApp', value);
   } catch (e) {
@@ -68,7 +70,7 @@ export const getstoreNumberdaysInApp = async () => {
   }
 };
 
-export const StoreFeedbackCheckNumberOfDay = async (value) => {
+export const StoreFeedbackCheckNumberOfDay = async value => {
   try {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem('StoreFeedbackCheckNumberOfDay', jsonValue);
@@ -88,7 +90,7 @@ export const getStoreFeedbackCheckNumberOfDay = async () => {
   }
 };
 
-export const storeLocationChatMap = async (value) => {
+export const storeLocationChatMap = async value => {
   try {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem('locationChatMap', jsonValue);
@@ -100,7 +102,7 @@ export const storeLocationChatMap = async (value) => {
 export const getLocationChatMap = () => {
   return new Promise((resolve, reject) => {
     try {
-      AsyncStorage.getItem('locationChatMap').then((jsonValue) => {
+      AsyncStorage.getItem('locationChatMap').then(jsonValue => {
         resolve(jsonValue != null ? JSON.parse(jsonValue) : null);
       });
     } catch (e) {

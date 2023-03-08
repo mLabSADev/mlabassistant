@@ -1,40 +1,34 @@
 import React, {useState, useEffect} from 'react';
 import {
-  Content,
+  Box,
+  VStack,
+  HStack,
+  Heading,
   View,
-  Container,
   Text,
   Input,
-  Item,
-  Icon,
+  Button,
   Picker,
-  Thumbnail,
+  Avatar,
+  Divider,
+  ScrollView,
 } from 'native-base';
 import {Formik} from 'formik';
 import {
   TouchableOpacity,
   PermissionsAndroid,
-  Image,
   ImageBackground,
   Alert,
-  KeyboardAvoidingView,
 } from 'react-native';
 
 import moment from 'moment';
-
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LocationService, GOOGLE_MAP_KEY} from '../services/location-service';
-// import OpenAppSettings from 'react-native-app-settings';
-import {
-  openSettings,
-  check,
-  PERMISSIONS,
-  RESULTS,
-} from 'react-native-permissions';
+import {openSettings} from 'react-native-permissions';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import {connect, useDispatch} from 'react-redux';
 import {ThemeColors} from '../theme/colors';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-// import storage from '@react-native-firebase/storage';
 import {useIsFocused} from '@react-navigation/native';
 import {
   getLocationChatMap,
@@ -131,39 +125,28 @@ export const PickerDate = ({value, onChangeTime}) => {
 };
 export const LoadChatBubble = ({}) => {
   return (
-    <View style={{marginLeft: 18}}>
-      <ImageBackground
-        style={{
-          height: 50,
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: 130,
-          overflow: 'hidden',
-          paddingTop: 10,
-        }}
-        source={require('../assets/chatbubble.png')}
-        imageStyle={{
-          resizeMode: 'contain',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Image
-          style={{
-            resizeMode: 'contain',
-            justifyContent: 'center',
-            alignItems: 'center',
-            alignSelf: 'center',
-          }}
-          source={require('../assets/loader3dot.gif')}
-        />
-      </ImageBackground>
-      <Text style={{margin: 0, padding: 0, color: 'grey', marginLeft: 16}}>
+    <HStack style={{marginLeft: 18}}>
+      <Text mx={9} color={'gray.300'}>
         Typing....
       </Text>
-    </View>
+    </HStack>
   );
 };
-
+/**
+ *  ChatForm
+ * @param {object} profile
+ * @param {str} chatBubbleColor
+ * @param {str} backgroundColor
+ * @param {obj} form gets data straight from leave.json
+ * @param {func} onValue
+ * @param {func} onAction (key, {sendMessage, nextMessage})
+ * @param {func} onDropdownList
+ * @param {obj} navigation gets navigation props from page
+ * @param {func} onAfterMessage
+ * @param {obj} prevForm
+ * @param {func} onCurrentMessage
+ * @returns
+ */
 const ChatForm = ({
   profile,
   chatBubbleColor = 'black',
@@ -198,10 +181,7 @@ const ChatForm = ({
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
 
-  // const schema = Yup.object().shape({
-  //   text: Yup.string().trim().required(),
-  // });
-
+  //
   const locationSelected = location => {
     console.log(location);
     const link =
@@ -229,7 +209,7 @@ const ChatForm = ({
         skipBackup: true,
       },
     };
-    console.log('Image uploaded start!');
+    console.log('Avatar uploaded start!');
     launchImageLibrary(options, async response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -245,26 +225,8 @@ const ChatForm = ({
         console.log(response.uri);
         const result = onValue(currentMessage.key, response.assets[0].uri);
         sendImage(result, false, currentMessage.key);
-        // await storage()
-        //   .ref(`businessLogo/${profile.uid}/`)
-        //   .putFile(response.uri)
-        //   .then(async () => {
-        //     console.log('Image uploaded to the bucket!');
-        //     await storage()
-        //       .ref(`businessLogo/${profile.uid}/`)
-        //       .getDownloadURL()
-        //       .then((res) => {
-        //         console.log(res);
-        //         const result = onValue(currentMessage.key, res);
-        //         sendImage(result, false, currentMessage.key);
-        //         dispatch(hideLoading());
-        //       });
-        //   });
-        // dispatch(hideLoading());
       }
     });
-
-    // dispatch(hideLoading())
   };
 
   const licenseDiskScanned = licenseDisk => {
@@ -310,21 +272,33 @@ const ChatForm = ({
   };
 
   const start = () => {
+    // console.log(form.start);
     setTimeout(() => {
+      console.log('>>>>', form.start);
       nextMessage(form.start);
     }, 500);
   };
-  // var messageKeyArray = []
+  /**
+   *  Next Message
+   * sets current message
+   * triggers onAction if message.type == 'action' else triggers sendMessage
+   * sets dropdown list
+   * @param {*} key 'greeting'
+   * @returns
+   */
   const nextMessage = key => {
+    // 1 get key data
     const message = form[key];
+
+    // 2 push key data
     messagesKey.push(key);
     setMessagesKey(messagesKey);
-    // console.log('*** nextMessage Key -', key);
-    //console.log(`*** nextMessage message - `,message);
+
+    // stop if no message...
     if (message == null) {
       return;
     }
-
+    // message = entire 'greeting: {}' obj + key = 'greeting' (index)
     setCurrentMessage({
       ...message,
       key: key,
@@ -332,31 +306,37 @@ const ChatForm = ({
 
     if (message.type == 'action') {
       if (onAction != null) {
+        // key = 'greeting'
         onAction(key, {sendMessage, nextMessage});
       }
     } else {
-      sendMessage(message.content, true);
+      sendMessage(message.content, true, key);
     }
+    return;
 
     if (message.fieldType === 'dropdown') {
       const dropdownResult = onDropdownList(key, {sendMessage, nextMessage});
 
       if (dropdownResult instanceof Promise) {
-        // App.showLoading('Loading list')
         dropdownResult
           .then(dropdown => {
             setDropdownList(dropdown);
           })
-          .finally(() => {
-            // App.stopLoading()
-          });
+          .finally(() => {});
       } else {
         setDropdownList(dropdownResult);
       }
     }
   };
 
+  /**
+   * Send Message
+   * @param {*} text content text
+   * @param {*} received true when nextMessage
+   * @param {*} currentMessageType
+   */
   const sendMessage = (text, received = false, currentMessageType) => {
+    console.log(`texh: ${text} - currentMessage: ${currentMessageType}`);
     setMessages(oldMessages => {
       const message = {
         text: text,
@@ -373,6 +353,13 @@ const ChatForm = ({
     });
   };
 
+  /**
+   *  Send Image
+   * adds 'image' property as true
+   * @param {*} text
+   * @param {*} received
+   * @param {*} currentMessageType
+   */
   const sendImage = (text, received = false, currentMessageType) => {
     setMessages(oldMessages => {
       const message = {
@@ -388,14 +375,19 @@ const ChatForm = ({
       return oldMessages.concat([message]);
     });
   };
+
+  /**
+   * Loading Chat Bubble
+   * @param {*} next
+   */
   const loadChatBubbleOnpress = next => {
     setshowloadchatbubble(true);
     setTimeout(() => {
       setshowloadchatbubble(false);
       nextMessage(next);
-    }, 1000);
+    }, 900);
   };
-  //const callback = useCallback()
+  // Get location
   const getLocation = async () => {
     setisFocusedCliked(true);
     getLocationChatMap().then(res => {
@@ -423,15 +415,12 @@ const ChatForm = ({
     });
   };
 
-  useEffect(() => {
-    if (isFocusedCliked === true) {
-      getLocation();
-      console.log(
-        '<--------- isFocused isFocused isFocused isFocused isFocused ---------->',
-      );
-    }
-  }, [isFocused]);
-
+  /**
+   *
+   * @param {*} values
+   * @param {*} handleReset
+   * @param {*} currentMessageType
+   */
   const send = (values, handleReset, currentMessageType) => {
     if (onValue != null) {
       const value = values.text;
@@ -495,10 +484,18 @@ const ChatForm = ({
           setDropdownList([]);
           break;
       }
-
       // handleReset()
     }
   };
+
+  useEffect(() => {
+    if (isFocusedCliked === true) {
+      getLocation();
+      console.log(
+        '<--------- isFocused isFocused isFocused isFocused isFocused ---------->',
+      );
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     // console.log('useEffect currentMessage');
@@ -522,9 +519,8 @@ const ChatForm = ({
     }
   }, [currentMessage]);
 
+  // triggers the next message and chatbubble loading animation whem 'messages' updates
   useEffect(() => {
-    // console.log(`<----- useEffect ${messagesEdit} ---->`);
-
     setTimeout(() => {
       setshowloadchatbubble(false);
     }, 1000);
@@ -542,16 +538,6 @@ const ChatForm = ({
         content._root.scrollToEnd();
       }
     }, 300);
-
-    // if (currentMessage != null) {
-    //     switch (currentMessage.type) {
-    //         case 'message':
-    //             if (currentMessage.next) {
-    //                 nextMessage(currentMessage.next)
-    //             }
-    //             break
-    //     }
-    // }
   }, [messages]);
 
   useEffect(() => {
@@ -563,13 +549,10 @@ const ChatForm = ({
   useEffect(() => {
     if (initialized === false) {
       setInit(true);
-
       console.log('prevForm', prevForm);
       if (prevForm != null && prevForm.currentMessage) {
         setMessages(prevForm.messages);
         setCurrentMessage(prevForm.currentMessage);
-
-        // console.log('prevForm.currentMessage');
       } else {
         start();
       }
@@ -577,6 +560,16 @@ const ChatForm = ({
     }
   }, []);
 
+  /**
+   *  Chat bot and User chat bubble
+   * @param {object} profile signed in user profile
+   * @param {string} chatBubbleColor
+   * @param {boolean} received
+   * @param {string} children text to show
+   * @param {boolean} isImage indicates if reply is an image
+   * @param {number} chatBubbleIndex indicates chat to edit
+   * @returns
+   */
   const ChatBubble = ({
     profile,
     chatBubbleColor,
@@ -586,52 +579,38 @@ const ChatForm = ({
     chatBubbleIndex,
   }) => {
     const radius = 20;
-
     return (
-      // console.log(Dimensions.get("window").height),
-      // console.log(JSON.stringify(messages, null, "\t")),
-      <View
+      <VStack
         style={{
           paddingBottom: 10,
           alignItems: received ? 'flex-start' : 'flex-end',
-          marginLeft: 20,
-          marginRight: 20,
-          marginTop: 5,
           flexDirection: received ? 'column' : 'row-reverse',
         }}>
-        <View
+        <HStack
+          bg={received ? ThemeColors.brandSecondary : ThemeColors.brandPrimary}
+          borderWidth={received ? 0 : 1}
+          px={3}
+          rounded={'3xl'}
+          shadow={'3'}
+          maxW={'90%'}
           style={{
-            backgroundColor: received
-              ? ThemeColors.brandSecondary
-              : ThemeColors.brandPrimary,
-            borderWidth: received ? 0 : 1,
-            borderColor: chatBubbleColor,
-            padding: 10,
-            borderRadius: radius,
             borderBottomLeftRadius: received ? 0 : radius,
             borderBottomRightRadius: received ? radius : 0,
-            maxWidth: 250,
-            shadowColor: '#000',
-            shadowOffset: {
-              width: 2,
-              height: 2,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
             flexDirection: received ? 'row' : 'row-reverse',
             alignItems: received ? 'flex-start' : 'center',
-            // marginRight: received ? 60 : 0,
-            // marginLeft: received ? 0 : 60
           }}>
+          {/* Thumbanils on chat bubbles */}
+          {/* Switches between user and bot avatar */}
           {received ? (
-            <Thumbnail
-              style={{width: 0, height: 0, marginRight: 0}}
-              // source={require('../assets/bot-avatar.jpg')}
+            <Avatar
+              size={0}
+              alt={'avatar'}
+              source={require('../assets/bot-avatar.jpg')}
             />
           ) : (
-            <Thumbnail
-              style={{width: 40, height: 40, marginLeft: 10}}
+            <Avatar
+              size={'md'}
+              alt={''}
               source={
                 profile.profilePicture
                   ? {uri: profile.profilePicture}
@@ -639,36 +618,22 @@ const ChatForm = ({
               }
             />
           )}
+
+          {/* Text / media rendered on chatbubble for both user and chatbot*/}
           <View style={{overflow: 'hidden'}}>
-            {/* {isImage ? <Image source={{ uri: children }} resizeMode='cover' style={{ width: 200, height: 200 }} />
-                            : <HTML containerStyle={{flex: 1}} onLinkPress={(event, href) => {
-                                Linking.openURL(href);
-                            }} html={
-                                `<div style="color: ${received ? 'black' : 'white'}">${children}</div>`
-                            } imagesMaxWidth={230} />} */}
             {isImage ? (
-              <Image
-                source={{uri: children}}
-                resizeMode="cover"
-                style={{borderRadius: 20, width: 180, height: 180}}
-              />
+              <Avatar source={{uri: children}} resizeMode="cover" />
             ) : null}
             {isImage ? null : (
-              <View style={{minHeight: 40, justifyContent: 'center'}}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    maxWidth: 180,
-                    color: received ? 'white' : 'white',
-                  }}>
-                  {children}
-                </Text>
-              </View>
+              <VStack justifyContent={'center'} p={2}>
+                <Text fontSize={16}>{children} </Text>
+              </VStack>
             )}
           </View>
-        </View>
+        </HStack>
+
+        {/* edit */}
         {!received ? (
-          // <TouchableOpacity onPress={() => { getChatBubbleIndex(chatBubbleIndex) }} style={{ alignSelf: 'center', alignItems: "center" }}>
           <TouchableOpacity
             onPress={() => {
               EditPrevChat(chatBubbleIndex);
@@ -684,17 +649,14 @@ const ChatForm = ({
                 alignSelf: 'center',
                 alignItems: 'center',
               }}>
-              <Icon
-                type="MaterialIcons"
-                name="edit"
-                style={{color: 'black', fontSize: 20}}
-              />
+              <Icon name="pencil" size={20} color={'black'} />
             </View>
           </TouchableOpacity>
         ) : null}
-      </View>
+      </VStack>
     );
   };
+
   const EditPrevChat = async i => {
     console.log(`getChatBubbleIndex ${i}`, i);
     console.log('if EditPrevChat ', messages.length);
@@ -726,254 +688,250 @@ const ChatForm = ({
   };
 
   return (
-    // console.log(`messages`,messages),
-    <Container
-      style={{
-        backgroundColor: ThemeColors.brandLight,
-        borderTopLeftRadius: 50,
-        borderTopRightRadius: 50,
-      }}>
-      <Content style={{flex: 1, padding: 10}} ref={c => (content = c)}>
-        {messages.map((message, index) => {
-          return (
-            <ChatBubble
-              profile={profile}
-              chatBubbleIndex={index}
-              chatBubbleColor={chatBubbleColor}
-              isImage={!!message.image}
-              key={index}
-              messageText={message.text}
-              received={message.received}>
-              {message.text}
-            </ChatBubble>
-          );
-        })}
-        {showloadchatbubble ? <LoadChatBubble /> : null}
-        {currentMessage && (
-          <View
-            style={{
-              paddingBottom: 20,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              flexDirection: 'row',
-            }}>
-            {currentMessage.type === 'options' &&
-              currentMessage.options.map((option, index) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      const result = onValue(currentMessage.key, option.text);
-                      sendMessage(result, false, currentMessage.key);
-                      loadChatBubbleOnpress(option.next);
-                      // nextMessage(option.next)
-                    }}
-                    key={index}
-                    style={{marginRight: 5, marginBottom: 5}}>
-                    {!showloadchatbubble ? (
-                      <View
-                        style={{
-                          backgroundColor: ThemeColors.brandSuccess,
-                          borderRadius: 20,
-                          padding: 5,
-                          paddingLeft: 15,
-                          paddingRight: 15,
-                          minWidth: 60,
-                        }}>
+    <VStack
+      flex={1}
+      bg={ThemeColors.brandLight}
+      borderTopLeftRadius={30}
+      borderTopRightRadius={30}>
+      <ScrollView>
+        <VStack flex={1} py={5} ref={c => (content = c)}>
+          {/* Shows chats */}
+          {/* can render inputs */}
+          {messages.map((message, index) => {
+            return (
+              <ChatBubble
+                profile={profile}
+                chatBubbleIndex={index}
+                chatBubbleColor={chatBubbleColor}
+                isImage={!!message.image}
+                key={index}
+                messageText={message.text}
+                received={message.received}>
+                {message.text}
+              </ChatBubble>
+            );
+          })}
+
+          {/* chatbot loading bubble */}
+
+          {showloadchatbubble ? <LoadChatBubble /> : null}
+
+          {/* message options */}
+          {currentMessage && (
+            <Button.Group
+              direction="column"
+              space={0}
+              p={2}
+              rounded={'3xl'}
+              marginBottom={10}>
+              {currentMessage.type === 'options' &&
+                currentMessage.options.map((option, index) => {
+                  return (
+                    <VStack>
+                      <Button
+                        variant={'ghost'}
+                        onPress={() => {
+                          const result = onValue(
+                            currentMessage.key,
+                            option.text,
+                          );
+                          console.log(result, currentMessage.key);
+                          sendMessage(result, false, currentMessage.key);
+                          loadChatBubbleOnpress(option.next);
+                        }}
+                        my={1}
+                        // bg={'gray.200'}
+                      >
                         <Text
                           style={{
-                            color: 'white',
+                            color: 'black',
                             fontSize: 14,
                             textAlign: 'center',
                           }}>
                           {option.text}
                         </Text>
-                      </View>
-                    ) : null}
-                  </TouchableOpacity>
-                );
-              })}
-          </View>
-        )}
-      </Content>
+                      </Button>
+                      <Divider bg={'gray.200'} />
+                    </VStack>
+                  );
+                })}
+            </Button.Group>
+          )}
+        </VStack>
+      </ScrollView>
+      {/* user reply section */}
       {!showloadchatbubble ? (
-        <KeyboardAvoidingView behavior={'height'}>
-          <View
-            style={{
-              height: 80,
-              padding: 10,
-              margin: 10,
-              backgroundColor: 'white',
-              borderRadius: 30,
-              justifyContent: 'center',
-              alignItems: 'center',
-              alignSelf: 'center',
-            }}>
-            <Formik
-              enableReinitialize={true}
-              onSubmit={(values, helpers) =>
-                send(values, helpers.resetForm, currentMessage.key)
-              }
-              initialValues={{text: currentText}}>
-              {({
-                values,
-                handleChange,
-                handleBlur,
-                handleSubmit,
-                setFieldValue,
-              }) => {
-                globalHandleChange = handleChange;
-                return (
-                  <View style={{flexDirection: 'row'}}>
-                    {currentMessage &&
-                    [
-                      'text',
-                      'date',
-                      'dropdown',
-                      'number',
-                      'phone',
-                      'time',
-                      'camera',
-                      'pin',
-                    ].indexOf(currentMessage.fieldType) > -1 ? (
-                      <Item
-                        rounded
-                        style={{
-                          backgroundColor: '#efefef',
-                          flex: 1,
-                          borderColor: 'transparent',
-                          marginRight: 10,
-                        }}>
-                        {currentMessage.fieldType === 'text' && (
-                          <Input
-                            value={values.text}
-                            onBlur={handleBlur('text')}
-                            onChangeText={handleChange('text')}
-                            style={inputStyle}
-                            placeholder="Input Text"
-                            placeholderTextColor="#c0c0c0"
-                          />
-                        )}
-                        {currentMessage.fieldType === 'phone' && (
-                          <Input
-                            keyboardType="phone-pad"
-                            value={values.text}
-                            onBlur={handleBlur('text')}
-                            onChangeText={handleChange('text')}
-                            style={inputStyle}
-                            placeholder="Input Text"
-                            placeholderTextColor="#c0c0c0"
-                          />
-                        )}
-                        {currentMessage.fieldType === 'number' && (
-                          <Input
-                            keyboardType="decimal-pad"
-                            value={values.text}
-                            onBlur={handleBlur('text')}
-                            onChangeText={handleChange('text')}
-                            style={inputStyle}
-                            placeholder="Input Text"
-                            placeholderTextColor="#c0c0c0"
-                          />
-                        )}
-                        {currentMessage.fieldType === 'time' && (
-                          <TimePicker
-                            value={values.text}
-                            onChangeTime={time => {
-                              handleChange('text')(time);
-                            }}
-                          />
-                        )}
-                        {currentMessage.fieldType === 'date' && (
-                          <PickerDate
-                            value={values.text}
-                            onChangeTime={time => {
-                              handleChange('text')(time);
-                            }}
-                          />
-                        )}
+        <VStack p={2} mt={2} bg={'white'} rounded={'3xl'}>
+          <Formik
+            enableReinitialize={true}
+            onSubmit={(values, helpers) =>
+              send(values, helpers.resetForm, currentMessage.key)
+            }
+            initialValues={{text: currentText}}>
+            {({
+              values,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              setFieldValue,
+            }) => {
+              globalHandleChange = handleChange;
+              return (
+                <HStack>
+                  {currentMessage &&
+                  [
+                    'text',
+                    'date',
+                    'dropdown',
+                    'number',
+                    'phone',
+                    'time',
+                    'camera',
+                    'pin',
+                  ].indexOf(currentMessage.fieldType) > -1 ? (
+                    <VStack
+                      rounded={'3xl'}
+                      style={{
+                        backgroundColor: '#efefef',
+                        flex: 1,
+                        borderColor: 'transparent',
+                        marginRight: 10,
+                      }}>
+                      {/* changes input type if currentMessage == true and its fieldType matches */}
+                      {/* render determined by field type */}
+                      {/* text */}
+                      {currentMessage.fieldType === 'text' && (
+                        <Input
+                          value={values.text}
+                          onBlur={handleBlur('text')}
+                          onChangeText={handleChange('text')}
+                          style={inputStyle}
+                          placeholder="Input Text"
+                          placeholderTextColor="#c0c0c0"
+                        />
+                      )}
 
-                        {currentMessage.fieldType === 'dropdown' && (
-                          <Picker
-                            selectedValue={values.text}
-                            onValueChange={value => {
-                              setFieldValue('text', value);
-                            }}>
-                            {dropdownList &&
-                              dropdownList.map((item, index) => {
-                                return (
-                                  <Picker.Item
-                                    key={index}
-                                    label={item.name}
-                                    value={`${index}`}
-                                  />
-                                );
-                              })}
-                          </Picker>
-                        )}
-                      </Item>
-                    ) : (
-                      <View style={{flex: 1}} />
-                    )}
+                      {/* phone */}
+                      {currentMessage.fieldType === 'phone' && (
+                        <Input
+                          keyboardType="phone-pad"
+                          value={values.text}
+                          onBlur={handleBlur('text')}
+                          onChangeText={handleChange('text')}
+                          style={inputStyle}
+                          placeholder="Input Text"
+                          placeholderTextColor="#c0c0c0"
+                        />
+                      )}
 
-                    {currentMessage && currentMessage.type === 'question' && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          handleSubmit();
-                        }}>
-                        <View
-                          style={{
-                            backgroundColor: ThemeColors.brandPrimary,
-                            width: 50,
-                            height: 50,
-                            borderRadius: 20,
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                      {/* number */}
+                      {currentMessage.fieldType === 'number' && (
+                        <Input
+                          keyboardType="decimal-pad"
+                          value={values.text}
+                          onBlur={handleBlur('text')}
+                          onChangeText={handleChange('text')}
+                          style={inputStyle}
+                          placeholder="Input Text"
+                          placeholderTextColor="#c0c0c0"
+                        />
+                      )}
+
+                      {/* time */}
+                      {currentMessage.fieldType === 'time' && (
+                        <TimePicker
+                          value={values.text}
+                          onChangeTime={time => {
+                            handleChange('text')(time);
+                          }}
+                        />
+                      )}
+
+                      {/* date */}
+                      {currentMessage.fieldType === 'date' && (
+                        <PickerDate
+                          value={values.text}
+                          onChangeTime={time => {
+                            handleChange('text')(time);
+                          }}
+                        />
+                      )}
+
+                      {/* dropdown */}
+                      {currentMessage.fieldType === 'dropdown' && (
+                        <Picker
+                          selectedValue={values.text}
+                          onValueChange={value => {
+                            setFieldValue('text', value);
                           }}>
-                          {(currentMessage.fieldType === 'text' ||
-                            currentMessage.fieldType === 'date' ||
-                            currentMessage.fieldType === 'time' ||
-                            currentMessage.fieldType === 'dropdown' ||
-                            currentMessage.fieldType === 'number' ||
-                            currentMessage.fieldType === 'phone') && (
-                            <Icon
-                              type="MaterialIcons"
-                              name="send"
-                              style={{color: 'white', fontSize: 20}}
-                            />
-                          )}
-                          {currentMessage.fieldType === 'licenseDisk' && (
-                            <Icon
-                              type="MaterialIcons"
-                              name="qr-scanner"
-                              style={{color: 'white', fontSize: 20}}
-                            />
-                          )}
-                          {currentMessage.fieldType === 'camera' && (
-                            <Icon
-                              type="MaterialIcons"
-                              name="camera"
-                              style={{color: 'white', fontSize: 20}}
-                            />
-                          )}
-                          {currentMessage.fieldType === 'location' && (
-                            <Icon
-                              type="MaterialIcons"
-                              name="pin-drop"
-                              style={{color: 'white', fontSize: 20}}
-                            />
-                          )}
-                        </View>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                );
-              }}
-            </Formik>
-          </View>
-        </KeyboardAvoidingView>
+                          {dropdownList &&
+                            dropdownList.map((item, index) => {
+                              return (
+                                <Picker.Item
+                                  key={index}
+                                  label={item.name}
+                                  value={`${index}`}
+                                />
+                              );
+                            })}
+                        </Picker>
+                      )}
+                    </VStack>
+                  ) : (
+                    <HStack flex={1}>
+                      <Input
+                        flex={1}
+                        rounded={'3xl'}
+                        borderColor={'gray.200'}
+                        fontSize={16}
+                        style={inputStyle}
+                        placeholder="Input Text"
+                        placeholderTextColor="#c0c0c0"
+                      />
+                    </HStack>
+                  )}
+
+                  {currentMessage && currentMessage.type === 'question' && (
+                    <TouchableOpacity
+                      onPress={() => {
+                        handleSubmit();
+                      }}>
+                      <View
+                        style={{
+                          backgroundColor: ThemeColors.brandPrimary,
+                          width: 50,
+                          height: 50,
+                          borderRadius: 20,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        {(currentMessage.fieldType === 'text' ||
+                          currentMessage.fieldType === 'date' ||
+                          currentMessage.fieldType === 'time' ||
+                          currentMessage.fieldType === 'dropdown' ||
+                          currentMessage.fieldType === 'number' ||
+                          currentMessage.fieldType === 'phone') && (
+                          <Icon name="send" size={20} color={'white'} />
+                        )}
+                        {currentMessage.fieldType === 'licenseDisk' && (
+                          <Icon name="qr-scanner" size={20} color={'white'} />
+                        )}
+                        {currentMessage.fieldType === 'camera' && (
+                          <Icon name="camera" size={20} color={'white'} />
+                        )}
+                        {currentMessage.fieldType === 'location' && (
+                          <Icon name="pin-drop" size={20} color={'white'} />
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  )}
+                </HStack>
+              );
+            }}
+          </Formik>
+        </VStack>
       ) : null}
-    </Container>
+    </VStack>
   );
 };
 
@@ -984,3 +942,4 @@ const stateToProps = state => {
 };
 
 export default connect(stateToProps)(ChatForm);
+// export default ChatForm;

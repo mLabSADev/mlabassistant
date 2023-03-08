@@ -3,10 +3,13 @@ import { signInWithGoogle, onAuthStateChangefirebase, logout } from "../services
 
 export const onAuthStateChange = createAsyncThunk('user/requestonAuthStateChange', async () => {
     console.log('go in onAuthStateChangefirebase');
-    const response = await onAuthStateChangefirebase()
+    const response = await onAuthStateChangefirebase() // << <Remove comment afer fixing google auth
     console.log(` onAuthStateChangefirebase`, response);
     if (response) {
         return response
+    } else {
+        // if user not signed it, trigger signin with google
+        // signInWithGoogle() >>> Developer Error
     }
 });
 

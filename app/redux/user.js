@@ -12,7 +12,8 @@ const user = createSlice({
     isLoading: false,
     isLoggedIn: false,
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
+    // update state depending on resonse
     builder.addCase(onAuthStateChange.fulfilled, (state, {payload}) => {
       console.log('it fulfilled', payload);
       if (payload === undefined) {

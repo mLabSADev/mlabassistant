@@ -8,6 +8,7 @@ import ClaimsPage from './app/pages/claims';
 import LeavePage from './app/pages/leave';
 import LoadingPage from './app/pages/loading';
 import ProfilePage from './app/pages/profile';
+import HomePage from './app/pages/home';
 import {Alert} from 'react-native';
 import {ThemeColors} from './app/theme/colors';
 import {View} from 'native-base';
@@ -25,8 +26,8 @@ const AuthStack = () => {
         headerShown: true,
       }}>
       <Stack.Screen
-        name="Login"
-        component={LoginPage}
+        name="Leave"
+        component={LeavePage}
         options={{title: 'Login', headerShown: false}}
       />
       <Stack.Screen
@@ -45,7 +46,7 @@ const AuthStack = () => {
 
 const AppStack = () => {
   return (
-    <Drawer.Navigator drawerContent={(props) => <View {...props} />}>
+    <Drawer.Navigator drawerContent={props => <View {...props} />}>
       <Stack.Screen
         name="Home"
         component={HomeStack}
@@ -69,11 +70,6 @@ const HomeStack = () => {
         component={ProfilePage}
         options={{title: 'Profile', headerShown: false}}
       />
-      {/* <Stack.Screen
-        name="Home"
-        component={HomePage}
-        options={{title: 'Home', headerShown: false}}
-      /> */}
       <Stack.Screen
         name="Claims"
         component={ClaimsPage}
@@ -89,12 +85,6 @@ const HomeStack = () => {
         component={LocationPage}
         options={{title: 'Location', headerShown: false}}
       />
-      {/* <Stack.Screen
-        name="Profile"
-        component={ProfilePage}
-        options={{title: 'Profile', headerShown: false}}
-      /> */}
-      {/* Add other inner app screens here */}
     </Stack.Navigator>
   );
 };
@@ -120,21 +110,11 @@ const NavigationStack = ({isLoggedIn, isLoading, showAsScreen, error}) => {
           },
           headerTintColor: '#fff',
         }}
-        drawerContent={(props) => <View />}>
-        {/* <RootStack.Screen
-          name="App"
-          component={
-            isLoading && showAsScreen
-              ? LoadingPage
-              : isLoggedIn
-              ? AppStack
-              : AuthStack
-          }
-        /> */}
+        drawerContent={props => <View />}>
         <RootStack.Screen
           name="App"
           component={
-            isLoading ? LoadingPage : isLoggedIn ? AppStack : AuthStack
+            isLoading ? LoadingPage : isLoggedIn ? AuthStack : AuthStack
           }
         />
       </RootStack.Navigator>
@@ -142,7 +122,7 @@ const NavigationStack = ({isLoggedIn, isLoading, showAsScreen, error}) => {
   );
 };
 
-const mapStatesToProps = (state) => {
+const mapStatesToProps = state => {
   return {
     isLoggedIn: state.user.isLoggedIn,
     isLoading: state.user.isLoading,

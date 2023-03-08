@@ -1,5 +1,16 @@
 {
   "start": "greeting",
+  "signedout": {
+    "type": "options",
+    "content": "Please sign in to continue.",
+    "next": "",
+    "options": [
+      {
+        "text": "Sign In",
+        "next": "signin"
+      }
+    ]
+  },
   "greeting": {
     "type": "options",
     "content": "How can I help you today?",
@@ -36,7 +47,6 @@
     "fieldType": "text",
     "next": "numberOfLeaveDaysTaken"
   },
-
   "sickLeaveCertificate": {
     "type": "options",
     "content": " If you are sick for more than 2 days, you must attach a sick certificate. Were you sick for more than 2 days ",

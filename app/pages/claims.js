@@ -170,7 +170,7 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                   nextMessage('continue');
                   break;
                 case 'finish':
-                  update().then((res) => {
+                  update().then(res => {
                     console.log('resxX', res);
                   });
 
@@ -206,10 +206,10 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                     );
                   }
                   if (leaveType !== true) {
-                  sendMessage(
-                    `You will be taking ${numberOfLeaveDays} days of leave `,
-                    true,
-                  );
+                    sendMessage(
+                      `You will be taking ${numberOfLeaveDays} days of leave `,
+                      true,
+                    );
                   }
                   // });
 
@@ -225,7 +225,7 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
               // navigation.goBack()
             }}
             onValue={(key, value) => {
-              setFormValues((values) => {
+              setFormValues(values => {
                 values[key] = value;
                 console.log({key});
                 console.log('qwert', values[key]);
@@ -254,11 +254,12 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                   let nightSpent;
 
                   LocationService.distanceFilter(origin, destination)
-                    .then((datax) => {
-                      const distanceFix = `${datax[0].elements[0].distance.text}`.replace(
-                        'km',
-                        '',
-                      );
+                    .then(datax => {
+                      const distanceFix =
+                        `${datax[0].elements[0].distance.text}`.replace(
+                          'km',
+                          '',
+                        );
                       const add = parseInt(distanceFix).toFixed(2);
                       console.log('distance', `R${add * 4.18}`);
                       kmTotal = add * 4.18;
@@ -278,7 +279,7 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                     end_date,
                     date_format = 'YYYY-MM-DD',
                   ) => {
-                    const getDateAsArray = (date) => {
+                    const getDateAsArray = date => {
                       return moment(date.split(/\D+/), date_format);
                     };
                     return (
@@ -329,7 +330,7 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
   );
 };
 
-const stateToProps = (state) => {
+const stateToProps = state => {
   return {
     profile: state.user.profile,
   };

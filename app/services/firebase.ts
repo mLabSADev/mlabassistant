@@ -8,10 +8,6 @@ GoogleSignin.configure({
   offlineAccess: false
 });
 
-// const servicesCollection = firestore().collection('services');
-// const opportunitiesCollection = firestore().collection('opportunities');
-// const Storageref = storage().ref('/users/');
-
 export async function signInWithGoogle() {
   return new Promise(async (resolve, reject) => {
     await GoogleSignin.signIn().then(async (res) => {
@@ -20,20 +16,7 @@ export async function signInWithGoogle() {
         var user = authdata.user;
         var uid = auth().currentUser.uid;
         console.log('User ID: ', uid)
-        // await createAccount(uid).then(async (rec)=>{
-        //   if (rec.id) {
-        //     // console.log(`<---if new user signInWithGoogle ---->`);
-        //     await mongoAuth()
-        //     await updateCurrentUser({
-        //       fullNames: user.displayName,
-        //       phoneNumber: user.phoneNumber,
-        //       email: user.email,
-        //       profilepicture: user.photoURL,
-        //       uid: user.uid,
-        //       popiActAccepted:true
-        //     })
-        //     resolve({ message: authdata, error: `newUser` });
-        //   } else {
+
         console.log(`<---else not new user signInWithGoogle ---->`);
         resolve({ message: authdata, error: `success` });
         //   }
@@ -52,6 +35,7 @@ export async function onAuthStateChangefirebase() {
   return new Promise((resolve, reject) => {
     return auth()
       .onAuthStateChanged(async (user) => {
+
         if (user) {
           resolve(user.uid);
           // await mongoAuth()

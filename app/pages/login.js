@@ -135,6 +135,9 @@ const LoginPage = ({navigation}) => {
               <HStack justifyContent={'center'}>
                 <Button
                   // variant={'ghost'}
+                  onPress={() => {
+                    googleLogin();
+                  }}
                   rounded={'full'}
                   bg={'red.600'}
                   w={46}

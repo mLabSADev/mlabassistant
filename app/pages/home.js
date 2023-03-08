@@ -39,7 +39,7 @@ const HomePage = ({navigation, profile, logout}) => {
   );
 };
 
-const stateToProps = (state) => {
+const stateToProps = state => {
   return {
     profile: state.user.profile,
   };
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     height: '50%',
     width: '100%',
     top: '30%',
-    borderRadius: 20,
+    // borderRadius: 20,
   },
 });
 export default connect(stateToProps)(HomePage);

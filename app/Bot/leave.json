@@ -71,7 +71,6 @@
     "fieldType": "date",
     "next": "continue"
   },
-
   "sickLeaveUploadOptional": {
     "type": "options",
     "content": "Please take a picture or upload you leave document",
