@@ -12,6 +12,7 @@ import {
   Avatar,
   Divider,
   Image,
+  PresenceTransition,
 } from 'native-base';
 import {Formik} from 'formik';
 import {
@@ -36,6 +37,7 @@ import {
   deleteLocationChatMap,
 } from '../services/localStorage';
 import {showLoading, hideLoading} from '../redux/app';
+import {opacity} from '../theme/transitions';
 
 export const TimePicker = ({value, onChangeTime}) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -71,9 +73,9 @@ export const TimePicker = ({value, onChangeTime}) => {
           setShowDatePicker(true);
         }}>
         {time ? (
-          <Text>{time}</Text>
+          <Text color="white">{time}</Text>
         ) : (
-          <Text style={{color: '#a0a0a0'}}>Select Time</Text>
+          <Text style={{color: 'white'}}>Select Time</Text>
         )}
       </TouchableOpacity>
     </View>
@@ -100,9 +102,9 @@ export const PickerDate = ({value, onChangeTime}) => {
   return (
     <Box
       style={{paddingLeft: 20, flex: 1}}
-      borderColor={'gray.200'}
-      bg={'gray.100'}
-      borderWidth={1}
+      borderColor={'blueGray.600'}
+      bg={'blueGray.600'}
+      borderWidth={0}
       rounded={'3xl'}>
       <DateTimePicker
         testID="dateTimePicker"
@@ -122,9 +124,9 @@ export const PickerDate = ({value, onChangeTime}) => {
           setShowDatePicker(true);
         }}>
         {time ? (
-          <Text color={'black'}>{time}</Text>
+          <Text color={'white'}>{time}</Text>
         ) : (
-          <Text style={{color: '#a0a0a0'}}>Select Date</Text>
+          <Text style={{color: 'white'}}>Select Date</Text>
         )}
       </TouchableOpacity>
     </Box>
@@ -305,6 +307,7 @@ const ChatForm = ({
     if (message == null) {
       return;
     }
+    // set active current message
     // message = entire 'greeting: {}' obj + key = 'greeting' (index)
     setCurrentMessage({
       ...message,
@@ -314,12 +317,14 @@ const ChatForm = ({
     if (message.type == 'action') {
       if (onAction != null) {
         // key = 'greeting'
-        onAction(key, {sendMessage, nextMessage});
+        const chats = messages;
+        onAction(key, {sendMessage, nextMessage, chats});
       }
     } else {
       sendMessage(message.content, true, key);
     }
 
+    // does not seem to be used for applying leave
     if (message.fieldType === 'dropdown') {
       const dropdownResult = onDropdownList(key, {sendMessage, nextMessage});
 
@@ -423,7 +428,6 @@ const ChatForm = ({
   };
 
   /**
-   *
    * @param {*} values
    * @param {*} handleReset
    * @param {*} currentMessageType
@@ -580,7 +584,7 @@ const ChatForm = ({
   const ChatBubble = ({
     profile,
     chatBubbleColor,
-    received,
+    received, // true when the message is from the bot
     children,
     isImage,
     chatBubbleIndex,
@@ -596,14 +600,13 @@ const ChatForm = ({
           flexDirection: received ? 'column' : 'row-reverse',
         }}>
         <HStack
-          bg={received ? ThemeColors.brandSecondary : ThemeColors.brandPrimary}
-          borderWidth={received ? 0 : 1}
+          bg={received ? 'blueGray.600' : 'green.800'}
+          borderWidth={received ? 0 : 0}
           p={1}
           space={0}
           rounded={20}
-          // shadow={'3'}
-          // alignItems={'center'}
-          maxW={'90%'}
+          shadow={'1'}
+          maxW={'96f%'}
           style={{
             // borderBottomLeftRadius: received ? 0 : radius,
             // borderBottomRightRadius: received ? radius : 0,
@@ -623,8 +626,8 @@ const ChatForm = ({
               size={'sm'}
               alt={''}
               source={
-                profile.profilePicture
-                  ? {uri: profile.profilePicture}
+                profile.photoURL
+                  ? {uri: profile.photoURL}
                   : {
                       uri: 'https://res.cloudinary.com/practicaldev/image/fetch/s--uFcwVGC1--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/27jpnicrgz7wztex78k4.jpg',
                     }
@@ -647,7 +650,12 @@ const ChatForm = ({
               </Box>
             ) : (
               <VStack justifyContent={'center'} p={2}>
-                <Text lineHeight={20} fontSize={16}>
+                <Text
+                  marginRight={received ? 6 : 0}
+                  lineHeight={18}
+                  // flex={1}
+                  fontSize={14}
+                  color={received ? 'white' : 'white'}>
                   {children}
                 </Text>
               </VStack>
@@ -659,13 +667,15 @@ const ChatForm = ({
         {!received ? (
           <Button
             mx={2}
-            bg={'blueGray.100'}
+            bg={'blueGray.700'}
             variant={'subtle'}
             onPress={() => {
               EditPrevChat(chatBubbleIndex);
             }}
             size={10}
-            endIcon={<Icon name="pencil" size={20} color={'gray'} />}></Button>
+            endIcon={
+              <Icon name="pencil" size={20} color={'#DAE1D1'} />
+            }></Button>
         ) : null}
       </VStack>
     );
@@ -704,36 +714,48 @@ const ChatForm = ({
   return (
     <VStack
       flex={1}
-      bg={ThemeColors.brandLight}
+      bg={'blueGray.700'}
       borderTopLeftRadius={30}
       borderTopRightRadius={30}>
       <ScrollView
         ref={ref => {
           scrollViewRef = ref;
-          console.log('/n +++++++' + scrollViewRef + '++++++++++');
         }}
-        // contentContainerStyle={{padding: 10}}
-        // onContentSizeChange={() => {
-        //   if (scrollViewRef) {
-        //     scrollViewRef.scrollToEnd({animated: true});
-        //   }
-        // }}
-      >
+        contentContainerStyle={{padding: 10}}
+        onContentSizeChange={() => {
+          if (scrollViewRef) {
+            scrollViewRef.scrollToEnd({animated: true});
+          }
+        }}>
         <VStack flex={1} py={5} ref={c => (content = c)}>
           {/* Shows chats */}
           {/* can render inputs */}
           {messages.map((message, index) => {
             return (
-              <ChatBubble
-                profile={profile}
-                chatBubbleIndex={index}
-                chatBubbleColor={chatBubbleColor}
-                isImage={!!message.image}
-                key={index}
-                messageText={message.text}
-                received={message.received}>
-                {message.text}
-              </ChatBubble>
+              <PresenceTransition
+                visible={true}
+                initial={{
+                  opacity: 0,
+                  translateY: -10,
+                }}
+                animate={{
+                  opacity: 1,
+                  translateY: 0,
+                  transition: {
+                    duration: 250,
+                  },
+                }}>
+                <ChatBubble
+                  profile={profile}
+                  chatBubbleIndex={index}
+                  chatBubbleColor={chatBubbleColor}
+                  isImage={!!message.image}
+                  key={index}
+                  messageText={message.text}
+                  received={message.received}>
+                  {message.text}
+                </ChatBubble>
+              </PresenceTransition>
             );
           })}
 
@@ -743,50 +765,55 @@ const ChatForm = ({
 
           {/* message options */}
           {currentMessage && (
-            <Button.Group
-              direction="column"
-              space={0}
-              p={2}
-              rounded={'3xl'}
-              marginBottom={10}>
-              {currentMessage.type === 'options' &&
-                currentMessage.options.map((option, index) => {
-                  return (
-                    <VStack>
-                      <Button
-                        variant={'ghost'}
-                        onPress={() => {
-                          const result = onValue(
-                            currentMessage.key,
-                            option.text,
-                          );
-                          console.log(result, currentMessage.key);
-                          sendMessage(result, false, currentMessage.key);
-                          loadChatBubbleOnpress(option.next);
-                        }}
-                        my={1}
-                        // bg={'gray.200'}
-                      >
-                        <Text
-                          style={{
-                            color: 'black',
-                            fontSize: 14,
-                            textAlign: 'center',
-                          }}>
-                          {option.text}
-                        </Text>
-                      </Button>
-                      <Divider bg={'gray.200'} />
-                    </VStack>
-                  );
-                })}
-            </Button.Group>
+            <PresenceTransition
+              visible={currentMessage ? true : false}
+              initial={opacity.initial}
+              animate={opacity.animate}>
+              <Button.Group
+                direction="column"
+                space={0}
+                p={2}
+                rounded={'3xl'}
+                marginBottom={10}>
+                {currentMessage.type === 'options' &&
+                  currentMessage.options.map((option, index) => {
+                    return (
+                      <VStack>
+                        <Button
+                          variant={'ghost'}
+                          onPress={() => {
+                            const result = onValue(
+                              currentMessage.key,
+                              option.text,
+                            );
+                            console.log(result, currentMessage.key);
+                            sendMessage(result, false, currentMessage.key);
+                            loadChatBubbleOnpress(option.next);
+                          }}
+                          my={1}
+                          // bg={'gray.200'}
+                        >
+                          <Text
+                            style={{
+                              color: 'white',
+                              fontSize: 14,
+                              textAlign: 'center',
+                            }}>
+                            {option.text}
+                          </Text>
+                        </Button>
+                        <Divider bg={'blueGray.600'} />
+                      </VStack>
+                    );
+                  })}
+              </Button.Group>
+            </PresenceTransition>
           )}
         </VStack>
       </ScrollView>
       {/* user reply section */}
       {!showloadchatbubble ? (
-        <VStack p={2} mt={2} bg={'white'} rounded={'3xl'}>
+        <VStack p={2} mt={2} bg={'blueGray.700'} rounded={'3xl'}>
           <Formik
             enableReinitialize={true}
             onSubmit={(values, helpers) =>
@@ -828,11 +855,10 @@ const ChatForm = ({
                       {currentMessage.fieldType === 'text' && (
                         <Input
                           flex={1}
-                          borderColor={'gray.200'}
-                          bg={'gray.100'}
-                          color={'gray.800'}
+                          borderColor={'blueGray.600'}
+                          bg={'blueGray.600'}
+                          color={'gray.100'}
                           fontSize={16}
-                          color={'gray.800'}
                           value={values.text}
                           onBlur={handleBlur('text')}
                           onChangeText={handleChange('text')}
@@ -845,10 +871,10 @@ const ChatForm = ({
                       {currentMessage.fieldType === 'phone' && (
                         <Input
                           flex={1}
-                          borderColor={'gray.200'}
-                          bg={'gray.100'}
+                          borderColor={'blueGray.600'}
+                          bg={'blueGray.600'}
                           fontSize={16}
-                          color={'gray.800'}
+                          color={'gray.100'}
                           keyboardType="phone-pad"
                           value={values.text}
                           onBlur={handleBlur('text')}
@@ -862,10 +888,10 @@ const ChatForm = ({
                       {currentMessage.fieldType === 'number' && (
                         <Input
                           flex={1}
-                          borderColor={'gray.200'}
-                          bg={'gray.100'}
+                          borderColor={'blueGray.600'}
+                          bg={'blueGray.600'}
                           fontSize={16}
-                          color={'gray.800'}
+                          color={'gray.100'}
                           keyboardType="decimal-pad"
                           value={values.text}
                           onBlur={handleBlur('text')}

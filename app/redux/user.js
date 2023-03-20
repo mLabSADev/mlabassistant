@@ -15,24 +15,23 @@ const user = createSlice({
   extraReducers: builder => {
     // update state depending on resonse
     builder.addCase(onAuthStateChange.fulfilled, (state, {payload}) => {
-      console.log('it fulfilled', payload);
+      console.log('builder.addCase > onAuthStateChanged > fulfilled');
       if (payload === undefined) {
-        console.log(`in if statement`);
+        console.log(`No user`);
         return {
           ...state,
           isLoading: false,
         };
       } else {
-        console.log(`in else statement`);
+        console.log(`User is available ` + payload.uid);
         return {
-          ...state,
-          //userId: payload,
+          profile: payload,
+          userId: payload.uid,
           isLoading: false,
           isLoggedIn: true,
         };
       }
     });
-
     builder.addCase(onAuthStateChange.pending, (state, {payload}) => {
       console.log('it pending', payload);
       return {...state, isLoading: true};
@@ -64,9 +63,8 @@ const user = createSlice({
         isLoggedIn: false,
       };
     });
-
     builder.addCase(googleSignIn.fulfilled, (state, {payload}) => {
-      console.log('it fulfilled state', state);
+      console.log('builder case > GoogleSignIn > fulfilled', state);
       // console.log('it fulfilled', payload);
       state.profile;
       if (payload.error === 'success') {

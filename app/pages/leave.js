@@ -19,13 +19,20 @@ import {
   SafeAreaView,
 } from 'react-native';
 import * as form from '../assets/leave.json';
+import firestore from '@react-native-firebase/firestore';
 import {ThemeColors} from '../theme/colors';
 import ChatForm from '../components/chat-form';
-import {connect, useDispatch} from 'react-redux';
+import {connect, useDispatch, useSelector} from 'react-redux';
 import {ChatBotName} from '../assets/app-consts';
 import {LocationService} from '../services/location-service';
+import {signIn} from '../redux/userAccountSlice';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-const LeavePage = ({navigation, profile, updateCV, route}) => {
+const LeavePage = ({navigation, updateCV, route}) => {
+  const profile = useSelector(state => state.user);
   const dispatch = useDispatch();
   const {goBack} = navigation;
   const onGoBack = () => {
@@ -34,6 +41,8 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
   };
   var data = {};
   const [formValues, setFormValues] = useState({});
+  const leaveDocument = firestore().collection('Leave');
+  const [messages, setMessages] = useState([]);
   const update = async () => {
     data = {
       typeOfClaim: formValues['claims'],
@@ -56,13 +65,27 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
     return data;
     // updateCV('BusinessProfile', data);
   };
-
+  const UserSignIn = async () => {
+    GoogleSignin.configure();
+    await GoogleSignin.hasPlayServices();
+    const userInfo = await GoogleSignin.signIn();
+    console.log('Leave > UserSignIn ', userInfo);
+  };
+  React.useEffect(() => {
+    setTimeout(() => {
+      for (key in profile) {
+        let el = `${key} : ${profile[key]}`;
+        console.log(el);
+      }
+      console.log('//////////////\n' + profile);
+    }, 2000);
+  }, []);
   return (
     <KeyboardAvoidingView style={{flex: 1}}>
-      <VStack flex={1}>
-        <Box flex={1} p={3}>
+      <VStack space={5} bg={'blueGray.700'} flex={1}>
+        <VStack space={3} flex={1} p={3}>
           <HStack
-            bg={'white'}
+            bg={'blueGray.800'}
             p={3}
             px={5}
             paddingRight={5}
@@ -71,25 +94,32 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
             space={4}>
             <Avatar source={require('../assets/bot-avatar.jpg')} />
             <Box flex={1}>
-              <Text fontSize={24} m={0} fontWeight={'bold'} color={'black'}>
+              <Text fontSize={24} m={0} fontWeight={'bold'} color={'white'}>
                 {ChatBotName.name}
               </Text>
-              <Text color={'green.200'} m={0}>
-                Online
-              </Text>
+              {profile.isLoggedIn ? (
+                <Text color={'green.400'} m={0}>
+                  You are online
+                </Text>
+              ) : (
+                <Text color={'red.400'} m={0}>
+                  You are offline
+                </Text>
+              )}
             </Box>
 
-            <Text color={'black'}>Applying for leave</Text>
+            <Text color={'blueGray.400'}>Applying for leave</Text>
           </HStack>
 
           <ChatForm
             navigation={navigation}
             route={route}
+            profile={profile}
             chatBubbleColor={'#073F4E'}
             form={form}
-            onAction={(key, {sendMessage, nextMessage}) => {
+            onAction={(key, {sendMessage, nextMessage, chats}) => {
               console.log('asdfghjk');
-              console.log({key, sendMessage, nextMessage});
+              setMessages(chats);
               switch (key) {
                 case 'greeting':
                   sendMessage(
@@ -106,6 +136,20 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
                   nextMessage('continue');
                   break;
                 case 'finish':
+                  console.log('ChatForm > onAction > switch > finish');
+                  if (profile.isLoggedIn) {
+                    leaveDocument
+                      .add({chats: chats, profile: profile})
+                      .then(res => {
+                        console.log('Firebase Document added');
+                      })
+                      .catch(err => {
+                        console.log('Firebase Document Error ', err);
+                      });
+                  } else {
+                    console.log('no Profile');
+                    UserSignIn();
+                  }
                   break;
               }
             }}
@@ -118,7 +162,7 @@ const LeavePage = ({navigation, profile, updateCV, route}) => {
               return value;
             }}
           />
-        </Box>
+        </VStack>
       </VStack>
     </KeyboardAvoidingView>
   );

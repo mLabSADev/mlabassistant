@@ -19,6 +19,7 @@ export const accountSlice = createSlice({
       state.image = payload.payload.image;
     },
     checkAuthState: async state => {
+      await GoogleSignin.configure();
       const isSignedIn = await GoogleSignin.isSignedIn();
       if (isSignedIn) {
         const currentUser = await GoogleSignin.getCurrentUser();
