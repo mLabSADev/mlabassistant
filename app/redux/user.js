@@ -23,7 +23,7 @@ const user = createSlice({
           isLoading: false,
         };
       } else {
-        console.log(`User is available ` + payload.uid);
+        console.log(`User > onAuthStateChange.fulfilled > else` + payload.uid);
         return {
           profile: payload,
           userId: payload.uid,

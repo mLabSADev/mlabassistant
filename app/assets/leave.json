@@ -1,16 +1,5 @@
 {
   "start": "greeting",
-  "signedout": {
-    "type": "options",
-    "content": "Please sign in to continue.",
-    "next": "",
-    "options": [
-      {
-        "text": "Sign In",
-        "next": "signin"
-      }
-    ]
-  },
   "greeting": {
     "type": "options",
     "content": "How can I help you today?",
@@ -18,7 +7,7 @@
     "options": [
       {
         "text": "Sick Leave",
-        "next": "sickLeave"
+        "next": "leave"
       },
       {
         "text": "Taking Leave days",
@@ -30,9 +19,9 @@
       }
     ]
   },
-  "sickLeave": {
+  "leave": {
     "type": "question",
-    "content": "Please explain why you are taking sick leave ",
+    "content": "Please explain why you are taking a leave.",
     "fieldType": "text",
     "next": "sickLeaveCertificate"
   },

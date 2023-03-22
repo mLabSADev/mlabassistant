@@ -6,11 +6,11 @@
     "next": "",
     "options": [
       {
-        "text": "Claims",
+        "text": "I want to claim for a trip.",
         "next": "claims"
       },
       {
-        "text": "Leave",
+        "text": "I want to apply for a leave.",
         "next": "leave"
       }
     ]
@@ -81,14 +81,12 @@
       }
     ]
   },
-
   "uberBolt": {
     "type": "question",
     "content": "Please upload your Uber/Bolt Invoice.",
     "fieldType": "camera",
     "next": "dateOfTravel"
   },
-
   "startAddress": {
     "type": "question",
     "content": "Enter your start address",
@@ -101,7 +99,6 @@
     "fieldType": "location",
     "next": "dateOfTravel"
   },
-
   "dateOfTravel": {
     "type": "question",
     "content": "What was the date of your travel?",
@@ -129,20 +126,6 @@
     "fieldType": "phone",
     "next": "continue"
   },
-  "continue": {
-    "type": "options",
-    "content": "Thank you press 'Continue' to save the changes on your claim",
-    "options": [
-      {
-        "text": "Continue",
-        "next": "finish"
-      }
-    ]
-  },
-  "finish": {
-    "type": "action"
-  },
-
   "leave": {
     "type": "options",
     "content": "What kind of leave do you want ?",
@@ -241,10 +224,9 @@
     "fieldType": "camera",
     "next": "startLeaveDay"
   },
-
   "continue": {
     "type": "options",
-    "content": "Thank you for applying for Leave press 'Continue' to save the changes on your Leave form'",
+    "content": "Thank you press 'Continue' to save the changes on your claim",
     "options": [
       {
         "text": "Continue",

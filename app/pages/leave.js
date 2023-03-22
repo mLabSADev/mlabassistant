@@ -18,7 +18,7 @@ import {
   ImageBackground,
   SafeAreaView,
 } from 'react-native';
-import * as form from '../assets/leave.json';
+import * as form from '../assets/claims.json';
 import firestore from '@react-native-firebase/firestore';
 import {ThemeColors} from '../theme/colors';
 import ChatForm from '../components/chat-form';
@@ -33,6 +33,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const LeavePage = ({navigation, updateCV, route}) => {
   const profile = useSelector(state => state.user);
+  const app = useSelector(state => state.app);
   const dispatch = useDispatch();
   const {goBack} = navigation;
   const onGoBack = () => {
@@ -72,13 +73,9 @@ const LeavePage = ({navigation, updateCV, route}) => {
     console.log('Leave > UserSignIn ', userInfo);
   };
   React.useEffect(() => {
-    setTimeout(() => {
-      for (key in profile) {
-        let el = `${key} : ${profile[key]}`;
-        console.log(el);
-      }
-      console.log('//////////////\n' + profile);
-    }, 2000);
+    for (key in app) {
+      console.log(app[key] + '<<<' + key);
+    }
   }, []);
   return (
     <KeyboardAvoidingView style={{flex: 1}}>
@@ -99,16 +96,23 @@ const LeavePage = ({navigation, updateCV, route}) => {
               </Text>
               {profile.isLoggedIn ? (
                 <Text color={'green.400'} m={0}>
-                  You are online
+                  online
                 </Text>
               ) : (
                 <Text color={'red.400'} m={0}>
-                  You are offline
+                  offline
                 </Text>
               )}
             </Box>
-
-            <Text color={'blueGray.400'}>Applying for leave</Text>
+            {app.botType === 'claims' && (
+              <Text color={'blueGray.400'}>Claiming for a trip</Text>
+            )}
+            {app.botType === 'leave' && (
+              <Text color={'blueGray.400'}>Applying for leave</Text>
+            )}
+            {app.botType === 'Welcome' && (
+              <Text color={'blueGray.400'}>{app.botType}</Text>
+            )}
           </HStack>
 
           <ChatForm
@@ -117,8 +121,7 @@ const LeavePage = ({navigation, updateCV, route}) => {
             profile={profile}
             chatBubbleColor={'#073F4E'}
             form={form}
-            onAction={(key, {sendMessage, nextMessage, chats}) => {
-              console.log('asdfghjk');
+            onAction={async (key, {sendMessage, nextMessage, chats}) => {
               setMessages(chats);
               switch (key) {
                 case 'greeting':
@@ -137,9 +140,15 @@ const LeavePage = ({navigation, updateCV, route}) => {
                   break;
                 case 'finish':
                   console.log('ChatForm > onAction > switch > finish');
+
                   if (profile.isLoggedIn) {
+                    console.log('finish > loggedIn');
+                    const data = {
+                      user: profile.profile.displayName || {},
+                      messages: chats || [],
+                    };
                     leaveDocument
-                      .add({chats: chats, profile: profile})
+                      .add(data)
                       .then(res => {
                         console.log('Firebase Document added');
                       })
@@ -147,6 +156,7 @@ const LeavePage = ({navigation, updateCV, route}) => {
                         console.log('Firebase Document Error ', err);
                       });
                   } else {
+                    console.log('Finish > noUser');
                     console.log('no Profile');
                     UserSignIn();
                   }

@@ -23,7 +23,7 @@ export const TopRight = ({findMe, onFindMeChange}) => {
   return (
     <View style={{flexDirection: 'row'}}>
       <Text style={{color: 'white'}}>Find Me</Text>
-      <Switch value={findMe} onValueChange={(value) => onFindMeChange(value)} />
+      <Switch value={findMe} onValueChange={value => onFindMeChange(value)} />
     </View>
   );
 };
@@ -39,16 +39,12 @@ export const LocationPage = ({navigation, route}) => {
   const [watchId, setWatchId] = useState(null);
   // const callback = route.params.callback // navigation.getParam('callback')
 
-  const onFindMeChanged = (findMe) => {
-    setFindMe(findMe);
-  };
-
   const confirmLocation = useCallback(async () => {
     if (addressLocation) {
       await LocationService.reverseGeocode(
         addressLocation.lat,
         addressLocation.lng,
-      ).then(async (add) => {
+      ).then(async add => {
         addressLocation.address = add;
         console.log(addressLocation);
         await storeLocationChatMap(addressLocation);
@@ -57,7 +53,7 @@ export const LocationPage = ({navigation, route}) => {
       await LocationService.reverseGeocode(
         currentLocation.lat,
         currentLocation.lng,
-      ).then(async (add) => {
+      ).then(async add => {
         currentLocation.address = add;
         console.log(currentLocation);
         await storeLocationChatMap(currentLocation);
@@ -70,7 +66,7 @@ export const LocationPage = ({navigation, route}) => {
     console.log('useEffect useEffect useEffect');
     if (address && address.search) {
       console.log('useEffect address if', address);
-      LocationService.addresses(address.text).then((add) => {
+      LocationService.addresses(address.text).then(add => {
         setAddresses(add);
       });
     } else {
@@ -100,7 +96,7 @@ export const LocationPage = ({navigation, route}) => {
   useEffect(() => {
     // navigation.setParams({findMe: true, findMeChanged: onFindMeChanged})
     const watchID = Geolocation.watchPosition(
-      (loc) => {
+      loc => {
         if (findMe) {
           setLocation({
             lat: loc.coords.latitude,
@@ -113,7 +109,7 @@ export const LocationPage = ({navigation, route}) => {
           });
         }
       },
-      (_err) => {},
+      _err => {},
       {
         maximumAge: 0,
         enableHighAccuracy: true,
@@ -139,7 +135,7 @@ export const LocationPage = ({navigation, route}) => {
   return (
     <Container style={{flex: 1, flexDirection: 'row'}}>
       <MapView
-        onPress={(event) => {
+        onPress={event => {
           setFindMe(false);
           setAddressLocation({
             lat: event.nativeEvent.coordinate.latitude,
@@ -199,7 +195,7 @@ export const LocationPage = ({navigation, route}) => {
           <DelayInput
             delayTimeout={1000}
             value={address.text}
-            onChangeText={(text) => {
+            onChangeText={text => {
               setFindMe(false);
               setAddress({text: text, search: true});
               navigation.setParams({findMe: false});
@@ -236,7 +232,7 @@ export const LocationPage = ({navigation, route}) => {
                       setAddress({text: add.description, search: false});
                       setAddresses([]);
                       LocationService.geocode(add.description).then(
-                        (location) => {
+                        location => {
                           console.log('<-- location -->', location);
                           setAddressLocation(location.location);
                         },

@@ -7,7 +7,7 @@ export const opacity = {
     opacity: 1,
     transition: {
       type: 'timing',
-      duration: 250,
+      duration: 550,
     },
   },
 };

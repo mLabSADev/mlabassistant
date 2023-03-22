@@ -56,7 +56,7 @@ export async function onAuthStateChangefirebase() {
           resolve(user);
           // await mongoAuth()
         } else {
-          resolve(undefined);
+          resolve(null);
         }
       })
   }).catch((error) => {

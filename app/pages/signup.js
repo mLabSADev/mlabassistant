@@ -18,7 +18,7 @@ const SignUpPage = ({navigation}) => {
     // login();
     navigation.navigate('Home');
   };
-  const onChangeemail = (val) => {
+  const onChangeemail = val => {
     console.log(val);
     setemail(val);
   };
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const dispatchToState = (dispatch) => {
+const dispatchToState = dispatch => {
   return {
     login: () => dispatch(login()),
   };

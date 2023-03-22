@@ -7,6 +7,7 @@ const app = createSlice({
       isLoading: false,
       message: null,
     },
+    botType: 'Welcome',
   },
   reducers: {
     showLoading: (state, {payload}) => {
@@ -15,15 +16,18 @@ const app = createSlice({
         message: payload,
       };
     },
-    hideLoading: (state) => {
+    hideLoading: state => {
       state.loader = {
         isLoading: false,
         message: null,
       };
     },
+    setBotType: (state, {payload}) => {
+      state.botType = payload;
+    },
   },
 });
 
-export const {showLoading, hideLoading} = app.actions;
+export const {showLoading, hideLoading, setBotType} = app.actions;
 
 export default app.reducer;

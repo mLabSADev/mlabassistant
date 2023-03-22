@@ -18,11 +18,11 @@ import {Formik} from 'formik';
 import {
   TouchableOpacity,
   PermissionsAndroid,
-  ImageBackground,
   Alert,
   ScrollView,
 } from 'react-native';
-
+import * as leave from '../assets/leave.json';
+import * as claims from '../assets/claims.json';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LocationService, GOOGLE_MAP_KEY} from '../services/location-service';
@@ -30,12 +30,13 @@ import {openSettings} from 'react-native-permissions';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import {connect, useDispatch} from 'react-redux';
 import {ThemeColors} from '../theme/colors';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import {useIsFocused} from '@react-navigation/native';
 import {
   getLocationChatMap,
   deleteLocationChatMap,
 } from '../services/localStorage';
+import {setBotType} from '../redux/app';
 import {showLoading, hideLoading} from '../redux/app';
 import {opacity} from '../theme/transitions';
 
@@ -185,6 +186,7 @@ const ChatForm = ({
   const [picturePicker, setpicturePicker] = useState();
   const [isFocusedCliked, setisFocusedCliked] = useState(false);
   const [messagesEdit, setMessagesEdit] = useState(false);
+
   let scrollViewRef;
 
   const isFocused = useIsFocused();
@@ -283,7 +285,6 @@ const ChatForm = ({
   const start = () => {
     // console.log(form.start);
     setTimeout(() => {
-      console.log('>>>>', form.start);
       nextMessage(form.start);
     }, 500);
   };
@@ -297,7 +298,16 @@ const ChatForm = ({
    */
   const nextMessage = key => {
     // 1 get key data
-    const message = form[key];
+    setCurrentMessage(null);
+    if (key == 'leave') {
+      console.log('301 : ' + key);
+    }
+    if (key === 'leave') {
+      dispatch(setBotType(key));
+    } else if (key === 'claims') {
+      dispatch(setBotType(key));
+    }
+    const message = key === 'leave' ? leave[key] : claims[key];
 
     // 2 push key data
     messagesKey.push(key);
@@ -682,6 +692,7 @@ const ChatForm = ({
   };
 
   const EditPrevChat = async i => {
+    // dispatch(setBotType('Welcome'));
     console.log(`getChatBubbleIndex ${i}`, i);
     console.log('if EditPrevChat ', messages.length);
     console.log('if EditChat messages', messages[i].currentMessageType);
@@ -764,7 +775,7 @@ const ChatForm = ({
           {showloadchatbubble ? <LoadChatBubble /> : null}
 
           {/* message options */}
-          {currentMessage && (
+          {currentMessage && !showloadchatbubble && (
             <PresenceTransition
               visible={currentMessage ? true : false}
               initial={opacity.initial}
@@ -789,10 +800,9 @@ const ChatForm = ({
                             console.log(result, currentMessage.key);
                             sendMessage(result, false, currentMessage.key);
                             loadChatBubbleOnpress(option.next);
+                            // setCurrentMessage(null);
                           }}
-                          my={1}
-                          // bg={'gray.200'}
-                        >
+                          my={1}>
                           <Text
                             style={{
                               color: 'white',
@@ -942,17 +952,7 @@ const ChatForm = ({
                       )}
                     </VStack>
                   ) : (
-                    <HStack flex={1}>
-                      {/* <Input
-                        flex={1}
-                        rounded={'3xl'}
-                        borderColor={'gray.200'}
-                        fontSize={16}
-                        style={inputStyle}
-                        placeholder="Input Text"
-                        placeholderTextColor="#c0c0c0"
-                      /> */}
-                    </HStack>
+                    <HStack flex={1}></HStack>
                   )}
 
                   {currentMessage && currentMessage.type === 'question' && (
