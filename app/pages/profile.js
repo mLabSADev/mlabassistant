@@ -106,7 +106,7 @@ const ProfilePage = ({navigation}) => {
         <View style={styles.marginSpaceTop16} />
         <FlatList
           data={DATA}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           //extraData={selectedId}
           renderItem={({item}) => (
             <List style={styles.list}>
@@ -215,8 +215,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStatesToProps = (state) => {
-  console.log(state.user.profile);
+const mapStatesToProps = state => {
+  state.user.profile;
   return {
     isLoggedIn: state.user.isLoggedIn,
     isLoading: state.user.isLoading,

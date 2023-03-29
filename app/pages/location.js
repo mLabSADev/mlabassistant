@@ -46,7 +46,7 @@ export const LocationPage = ({navigation, route}) => {
         addressLocation.lng,
       ).then(async add => {
         addressLocation.address = add;
-        console.log(addressLocation);
+        addressLocation;
         await storeLocationChatMap(addressLocation);
       });
     } else if (currentLocation) {
@@ -55,7 +55,7 @@ export const LocationPage = ({navigation, route}) => {
         currentLocation.lng,
       ).then(async add => {
         currentLocation.address = add;
-        console.log(currentLocation);
+        currentLocation;
         await storeLocationChatMap(currentLocation);
       });
     }
@@ -63,14 +63,14 @@ export const LocationPage = ({navigation, route}) => {
   }, [addressLocation, currentLocation, navigation]);
 
   useEffect(() => {
-    console.log('useEffect useEffect useEffect');
+    ('useEffect useEffect useEffect');
     if (address && address.search) {
-      console.log('useEffect address if', address);
+      'useEffect address if', address;
       LocationService.addresses(address.text).then(add => {
         setAddresses(add);
       });
     } else {
-      console.log('useEffect address', address);
+      'useEffect address', address;
     }
   }, [address]);
 
@@ -79,7 +79,7 @@ export const LocationPage = ({navigation, route}) => {
       'hardwareBackPress',
       function () {
         if (route.name === 'Location') {
-          console.log('LocationPage LocationPage LocationPage LocationPage');
+          ('LocationPage LocationPage LocationPage LocationPage');
           storeLocationChatMap('Goback').then(() => {
             navigation.goBack();
           });
@@ -120,7 +120,7 @@ export const LocationPage = ({navigation, route}) => {
     setWatchId(watchID);
 
     return () => {
-      console.log('Stop listening to location');
+      ('Stop listening to location');
       Geolocation.clearWatch(watchID);
       Geolocation.stopObserving();
     };
@@ -141,10 +141,6 @@ export const LocationPage = ({navigation, route}) => {
             lat: event.nativeEvent.coordinate.latitude,
             lng: event.nativeEvent.coordinate.longitude,
           });
-          console.log(
-            'map event.nativeEvent.coordinate',
-            event.nativeEvent.coordinate,
-          );
         }}
         provider={PROVIDER_GOOGLE}
         style={{flex: 1}}
@@ -233,7 +229,7 @@ export const LocationPage = ({navigation, route}) => {
                       setAddresses([]);
                       LocationService.geocode(add.description).then(
                         location => {
-                          console.log('<-- location -->', location);
+                          '<-- location -->', location;
                           setAddressLocation(location.location);
                         },
                       );

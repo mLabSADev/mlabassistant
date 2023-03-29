@@ -19,7 +19,7 @@ const SignUpPage = ({navigation}) => {
     navigation.navigate('Home');
   };
   const onChangeemail = val => {
-    console.log(val);
+    val;
     setemail(val);
   };
   return (

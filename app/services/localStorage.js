@@ -6,8 +6,8 @@ export const storeToken = async value => {
   try {
     await AsyncStorage.setItem('storeTokenLocal', value);
   } catch (e) {
-    console.log(e);
-    console.log(e);
+    e;
+    e;
   }
 };
 
@@ -18,7 +18,7 @@ export const getToken = async () => {
       return value;
     }
   } catch (e) {
-    console.log(e);
+    e;
   }
 };
 
@@ -26,17 +26,17 @@ export const storeTokenDelete = async () => {
   try {
     await AsyncStorage.removeItem('storeTokenLocal');
   } catch (e) {
-    console.log(e);
+    e;
   }
 
-  console.log('Done.');
+  ('Done.');
 };
 
 export const storeUIDLocal = async value => {
   try {
     await AsyncStorage.setItem('storeUIDLocal', value);
   } catch (e) {
-    console.log(e);
+    e;
   }
 };
 
@@ -47,7 +47,7 @@ export const getStoreUIDLocal = async () => {
       return value;
     }
   } catch (e) {
-    console.log(e);
+    e;
   }
 };
 
@@ -55,7 +55,7 @@ export const storeNumberdaysInApp = async value => {
   try {
     await AsyncStorage.setItem('storeNumberdaysInApp', value);
   } catch (e) {
-    console.log(e);
+    e;
   }
 };
 
@@ -66,7 +66,7 @@ export const getstoreNumberdaysInApp = async () => {
       return value;
     }
   } catch (e) {
-    console.log(e);
+    e;
   }
 };
 
@@ -86,7 +86,7 @@ export const getStoreFeedbackCheckNumberOfDay = async () => {
     );
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch (e) {
-    console.log(e);
+    e;
   }
 };
 
@@ -95,7 +95,7 @@ export const storeLocationChatMap = async value => {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem('locationChatMap', jsonValue);
   } catch (e) {
-    console.log(e);
+    e;
   }
 };
 
@@ -106,7 +106,7 @@ export const getLocationChatMap = () => {
         resolve(jsonValue != null ? JSON.parse(jsonValue) : null);
       });
     } catch (e) {
-      console.log(e);
+      e;
     }
   });
 };
@@ -115,6 +115,6 @@ export const deleteLocationChatMap = async () => {
   try {
     await AsyncStorage.removeItem('locationChatMap');
   } catch (e) {
-    console.log(e);
+    e;
   }
 };

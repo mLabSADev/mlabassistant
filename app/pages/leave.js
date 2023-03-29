@@ -9,6 +9,7 @@ import {
   HStack,
   Heading,
   Avatar,
+  useToast,
 } from 'native-base';
 import {
   TouchableOpacity,
@@ -32,50 +33,55 @@ import {
 } from '@react-native-google-signin/google-signin';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const LeavePage = ({navigation, updateCV, route}) => {
-  const profile = useSelector(state => state.user);
-  const app = useSelector(state => state.app);
-  const dispatch = useDispatch();
-  const {goBack} = navigation;
-  const onGoBack = () => {
-    goBack();
-    goBack();
+  const user = {
+    profile: {},
+    isLoggedIn: false,
   };
+
   var data = {};
   const [formValues, setFormValues] = useState({});
   const leaveDocument = firestore().collection('Leave');
   const [messages, setMessages] = useState([]);
-  const update = async () => {
-    data = {
-      typeOfClaim: formValues['claims'],
-      personalPayment: formValues['personalPayment'],
-      howmuch: formValues['howmuch'],
-      takePicture: formValues['takePicture'],
-      upload: formValues['upload'],
-      travel: formValues['travel'],
-      modeOfTransportOptional: formValues['modeOfTransportOptional'],
-      uberBolt: formValues['uberBolt'],
-      startAddress: formValues['ownVehicle'].location,
-      destination: formValues['destination'].location,
-      dateOfTravel: formValues['dateOfTravel'],
-      nightSpentOptional: formValues['nightSpentOptional'],
-      nightSpentYes: formValues['nightSpentYes'],
-      //nightSpentYes: formValues['nightSpentYes'].location,
-      complete: true,
-    };
-    // console.log(data);
-    return data;
-    // updateCV('BusinessProfile', data);
-  };
+  const [name, setName] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profile, setProfile] = useState({});
+  const toast = useToast();
+
   const UserSignIn = async () => {
-    GoogleSignin.configure();
-    await GoogleSignin.hasPlayServices();
-    const userInfo = await GoogleSignin.signIn();
-    console.log('Leave > UserSignIn ', userInfo);
+    try {
+      GoogleSignin.configure({
+        webClientId:
+          '850465646909-2cfodnp5aquup07hi3kdiblasrr97bqg.apps.googleusercontent.com',
+        offlineAccess: false,
+      });
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      setProfile(userInfo.user);
+      setIsLoggedIn(true);
+      toast.show({title: 'Signed in'});
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        toast.show({title: 'Sign-in Cancelled'});
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        toast.show({title: 'Sign-in in Progress'});
+        await GoogleSignin.signInSilently();
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        toast.show({
+          title: 'Sign-in failed',
+          description: 'Play service not available',
+        });
+        // play services not available or outdated
+      } else {
+        toast.show({title: 'Signin Failed', description: error.message});
+        await GoogleSignin.signInSilently();
+        // some other error happened
+      }
+    }
   };
   React.useEffect(() => {
-    for (key in app) {
-      console.log(app[key] + '<<<' + key);
-    }
+    UserSignIn();
   }, []);
   return (
     <KeyboardAvoidingView style={{flex: 1}}>
@@ -94,7 +100,7 @@ const LeavePage = ({navigation, updateCV, route}) => {
               <Text fontSize={24} m={0} fontWeight={'bold'} color={'white'}>
                 {ChatBotName.name}
               </Text>
-              {profile.isLoggedIn ? (
+              {isLoggedIn ? (
                 <Text color={'green.400'} m={0}>
                   online
                 </Text>
@@ -104,15 +110,7 @@ const LeavePage = ({navigation, updateCV, route}) => {
                 </Text>
               )}
             </Box>
-            {app.botType === 'claims' && (
-              <Text color={'blueGray.400'}>Claiming for a trip</Text>
-            )}
-            {app.botType === 'leave' && (
-              <Text color={'blueGray.400'}>Applying for leave</Text>
-            )}
-            {app.botType === 'Welcome' && (
-              <Text color={'blueGray.400'}>{app.botType}</Text>
-            )}
+            {name ? <Text>{name}</Text> : <Text>Welcome</Text>}
           </HStack>
 
           <ChatForm
@@ -125,46 +123,50 @@ const LeavePage = ({navigation, updateCV, route}) => {
               setMessages(chats);
               switch (key) {
                 case 'greeting':
-                  sendMessage(
-                    `Hello ${profile.fullNames}, my name is ${ChatBotName.name} and I will be helping you create your beautiful CV, by giving you suggestions about why and where you should give out your information.`,
-                    true,
-                  );
-                  nextMessage('claims');
                   break;
                 case 'thankyou':
-                  sendMessage(
-                    `Thank you ${profile.fullNames} for you time. You can now proceed and start using a customized version of the app`,
-                    true,
-                  );
-                  nextMessage('continue');
                   break;
                 case 'finish':
-                  console.log('ChatForm > onAction > switch > finish');
+                  'ChatForm > onAction > switch > finish';
 
-                  if (profile.isLoggedIn) {
-                    console.log('finish > loggedIn');
+                  if (isLoggedIn) {
+                    ('finish > loggedIn');
                     const data = {
-                      user: profile.profile.displayName || {},
+                      user: profile || {},
                       messages: chats || [],
                     };
                     leaveDocument
                       .add(data)
                       .then(res => {
-                        console.log('Firebase Document added');
+                        toast.show({
+                          render: () => {
+                            return (
+                              <Box
+                                p={3}
+                                rounded={'3xl'}
+                                background={'green.600'}>
+                                <Text color="white">Request sent</Text>
+                              </Box>
+                            );
+                          },
+                        });
                       })
                       .catch(err => {
-                        console.log('Firebase Document Error ', err);
+                        toast.show({
+                          title: 'Something went wrong',
+                          description: 'Request failed to send',
+                        });
                       });
                   } else {
-                    console.log('Finish > noUser');
-                    console.log('no Profile');
+                    ('Finish > noUser');
+                    ('no Profile');
                     UserSignIn();
                   }
                   break;
               }
             }}
             onValue={(key, value) => {
-              console.log('Formik onValue');
+              ('Formik onValue');
               setFormValues(values => {
                 values[key] = value;
                 return values;
@@ -183,7 +185,7 @@ const stateToProps = state => {
     profile: state.user.profile,
   };
 };
-export default connect(stateToProps)(LeavePage);
+export default LeavePage;
 
 let ScreenHeight = Dimensions.get('window').height;
 let ScreenHeightHalf = Dimensions.get('window').height / 1.5;

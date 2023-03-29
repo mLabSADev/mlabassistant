@@ -14,7 +14,7 @@ export async function geocode(address) {
       address.split(' ').join('+') +
       '&key=' +
       GOOGLE_MAP_KEY,
-  ).then((res) => {
+  ).then(res => {
     const x = res.data.results[0];
     return x;
   });
@@ -22,7 +22,7 @@ export async function geocode(address) {
 
 export class LocationService {
   static async requestPermissions() {
-    console.log('!!!!!!!!!! requestPermissions !!!!!!!!!!!!');
+    ('!!!!!!!!!! requestPermissions !!!!!!!!!!!!');
     if (Platform.OS === 'ios') {
       Geolocation.requestAuthorization();
     }
@@ -51,7 +51,7 @@ export class LocationService {
   }
 
   static async addresses(address) {
-    console.log(address);
+    address;
     address = address.split(' ').join('+');
     const res = await Axios.get(
       `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${address}&key=${GOOGLE_MAP_KEY}`,
@@ -63,8 +63,8 @@ export class LocationService {
     const res = await Axios.get(
       `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&units=metric&key=${GOOGLE_MAP_KEY}`,
     );
-    console.log('res');
-    console.log(JSON.stringify(res.data.rows, null, '\t'));
+    ('res');
+    JSON.stringify(res.data.rows, null, '\t');
     return res.data.rows;
   }
   static async reverseGeocode(lat, lng) {
@@ -92,16 +92,16 @@ export class LocationService {
   static getCurrentPosition() {
     return new Promise((resolve, reject) => {
       Geolocation.getCurrentPosition(
-        (location) => {
+        location => {
           resolve(location);
         },
-        (err) => {
+        err => {
           resolve(err.code);
           LocationService.requestPermissions();
           Alert.alert(
             'Location permission denied',
             'Please enable location from your phone settings for better experience on the app',
-            [{text: 'Okay', onPress: () => console.log('close alert')}],
+            [{text: 'Okay', onPress: () => 'close alert'}],
           );
         },
         {

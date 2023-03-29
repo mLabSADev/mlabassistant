@@ -11,12 +11,12 @@ const HomePage = ({navigation, profile, logout}) => {
     navigation.navigate('Claims');
     // LocationService.addresses()
     //   .then((addresses) => {
-    //     console.log('addresses');
-    //     console.log(addresses);
+    //      ('addresses');
+    //      (addresses);
     //   })
     //   .catch((e) => {
-    //     console.log('error');
-    //     console.log(e);
+    //      ('error');
+    //      (e);
     //   });
   };
   const onLeave = () => {

@@ -33,18 +33,18 @@ const LoginPage = ({navigation}) => {
     // navigation.navigate('Claims');
   };
   const onChangeEmail = val => {
-    console.log(val);
+    val;
     setEmail(val);
   };
   const onChangePassword = val => {
-    console.log(val);
+    val;
     setPassword(val);
   };
   const googleLogin = () => {
     // setModalVisible(!modalVisible);
     // dispatch(showLoading('Logging in...'));
     dispatch(googleSignIn()).then(data => {
-      console.log('sign up navigation fix', data.payload.error);
+      'sign up navigation fix', data.payload.error;
       //onLogin();
     });
   };

@@ -15,15 +15,15 @@ const user = createSlice({
   extraReducers: builder => {
     // update state depending on resonse
     builder.addCase(onAuthStateChange.fulfilled, (state, {payload}) => {
-      console.log('builder.addCase > onAuthStateChanged > fulfilled');
+      ('builder.addCase > onAuthStateChanged > fulfilled');
       if (payload === undefined) {
-        console.log(`No user`);
+        `No user`;
         return {
           ...state,
           isLoading: false,
         };
       } else {
-        console.log(`User > onAuthStateChange.fulfilled > else` + payload.uid);
+        `User > onAuthStateChange.fulfilled > else` + payload.uid;
         return {
           profile: payload,
           userId: payload.uid,
@@ -33,15 +33,15 @@ const user = createSlice({
       }
     });
     builder.addCase(onAuthStateChange.pending, (state, {payload}) => {
-      console.log('it pending', payload);
+      'it pending', payload;
       return {...state, isLoading: true};
     });
     builder.addCase(onAuthStateChange.rejected, (state, {payload}) => {
-      console.log('it rejected', payload);
+      'it rejected', payload;
       return {...state, isLoading: false};
     });
     builder.addCase(logOut.fulfilled, (state, {payload}) => {
-      console.log('it fulfilled logOut', payload);
+      'it fulfilled logOut', payload;
       return {
         ...state,
         profile: {
@@ -64,8 +64,8 @@ const user = createSlice({
       };
     });
     builder.addCase(googleSignIn.fulfilled, (state, {payload}) => {
-      console.log('builder case > GoogleSignIn > fulfilled', state);
-      // console.log('it fulfilled', payload);
+      'builder case > GoogleSignIn > fulfilled', state;
+      //  ('it fulfilled', payload);
       state.profile;
       if (payload.error === 'success') {
         return {
@@ -88,11 +88,11 @@ const user = createSlice({
       }
     });
     builder.addCase(googleSignIn.pending, (state, {payload}) => {
-      console.log('it pending', payload);
+      'it pending', payload;
       return {...state, isLoading: false};
     });
     builder.addCase(googleSignIn.rejected, (state, {payload}) => {
-      console.log('it rejected', payload);
+      'it rejected', payload;
       return {...state, isLoading: false};
     });
   },

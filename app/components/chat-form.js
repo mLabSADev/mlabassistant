@@ -28,7 +28,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {LocationService, GOOGLE_MAP_KEY} from '../services/location-service';
 import {openSettings} from 'react-native-permissions';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import {connect, useDispatch} from 'react-redux';
+import {connect, useDispatch, useSelector} from 'react-redux';
 import {ThemeColors} from '../theme/colors';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useIsFocused} from '@react-navigation/native';
@@ -191,10 +191,9 @@ const ChatForm = ({
 
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
-
+  const botType = useSelector(state => state);
   //
   const locationSelected = location => {
-    console.log(location);
     const link =
       `https://maps.googleapis.com/maps/api/staticmap?center=${location.lat},${location.lng}&zoom=17&size=600x300&maptype=roadmap` +
       `&markers=color:red%7Clabel:L%7C${location.lat},${location.lng}` +
@@ -204,9 +203,7 @@ const ChatForm = ({
       location: location,
       link: link,
     });
-    // console.log('locationSelected', result);
-    // console.log(result.link);
-    // console.log(result.location);
+
     sendImage(result.link, false, currentMessage.key);
   };
 
@@ -220,20 +217,14 @@ const ChatForm = ({
         skipBackup: true,
       },
     };
-    console.log('Avatar uploaded start!');
     launchImageLibrary(options, async response => {
       if (response.didCancel) {
-        console.log('User cancelled image picker');
         dispatch(hideLoading());
       } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
         dispatch(hideLoading());
       } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
         dispatch(hideLoading());
       } else {
-        console.log(response);
-        console.log(response.uri);
         const result = onValue(currentMessage.key, response.assets[0].uri);
         sendImage(result, false, currentMessage.key);
       }
@@ -283,7 +274,6 @@ const ChatForm = ({
   };
 
   const start = () => {
-    // console.log(form.start);
     setTimeout(() => {
       nextMessage(form.start);
     }, 500);
@@ -299,15 +289,12 @@ const ChatForm = ({
   const nextMessage = key => {
     // 1 get key data
     setCurrentMessage(null);
-    if (key == 'leave') {
-      console.log('301 : ' + key);
-    }
     if (key === 'leave') {
       dispatch(setBotType(key));
     } else if (key === 'claims') {
       dispatch(setBotType(key));
     }
-    const message = key === 'leave' ? leave[key] : claims[key];
+    const message = key === 'leave' ? [key] : claims[key];
 
     // 2 push key data
     messagesKey.push(key);
@@ -357,21 +344,16 @@ const ChatForm = ({
    * @param {*} currentMessageType
    */
   const sendMessage = (text, received = false, currentMessageType) => {
-    console.log(`texh: ${text} - currentMessage: ${currentMessageType}`);
-    setMessages(oldMessages => {
-      const message = {
-        text: text,
-        received: received,
-        currentMessageType: currentMessageType,
-      };
-      const newMessages = oldMessages.concat([message]);
+    const message = {
+      text: text,
+      received: received,
+      currentMessageType: currentMessageType,
+    };
+    setMessages(oldMessages => [...oldMessages, message]);
 
-      if (onAfterMessage != null) {
-        onAfterMessage({message, currentMessage});
-      }
-
-      return newMessages;
-    });
+    if (onAfterMessage != null) {
+      onAfterMessage({message, currentMessage});
+    }
   };
 
   /**
@@ -382,19 +364,16 @@ const ChatForm = ({
    * @param {*} currentMessageType
    */
   const sendImage = (text, received = false, currentMessageType) => {
-    setMessages(oldMessages => {
-      const message = {
-        text: text,
-        received: received,
-        image: true,
-        currentMessageType: currentMessageType,
-      };
-      if (onAfterMessage != null) {
-        onAfterMessage({message, currentMessage});
-      }
-
-      return oldMessages.concat([message]);
-    });
+    const message = {
+      text: text,
+      received: received,
+      image: true,
+      currentMessageType: currentMessageType,
+    };
+    setMessages(oldMessages => [...oldMessages, message]);
+    if (onAfterMessage != null) {
+      onAfterMessage({message, currentMessage});
+    }
   };
 
   /**
@@ -415,20 +394,13 @@ const ChatForm = ({
     getLocationChatMap().then(res => {
       switch (res) {
         case null:
-          console.log('getLocationChatMap in null null');
-          console.log('in if getLocation', res);
           navigate('Location');
           break;
         case 'Goback':
-          console.log('getLocationChatMap in undefined undefined');
-          console.log(isFocusedCliked);
-          console.log(isFocusedCliked);
           deleteLocationChatMap();
           break;
 
         default:
-          console.log('getLocationChatMap in Object lat lng ');
-          console.log('in else getLocation', res);
           locationSelected(res);
           deleteLocationChatMap();
           setisFocusedCliked(false);
@@ -512,14 +484,10 @@ const ChatForm = ({
   useEffect(() => {
     if (isFocusedCliked === true) {
       getLocation();
-      console.log(
-        '<--------- isFocused isFocused isFocused isFocused isFocused ---------->',
-      );
     }
   }, [isFocused]);
 
   useEffect(() => {
-    // console.log('useEffect currentMessage');
     if (onCurrentMessage != null) {
       onCurrentMessage(currentMessage);
     }
@@ -533,7 +501,6 @@ const ChatForm = ({
               nextMessage(currentMessage.next);
             }, 1100);
           } else {
-            // console.log('nooo nextMessage');
           }
           break;
       }
@@ -570,7 +537,6 @@ const ChatForm = ({
   useEffect(() => {
     if (initialized === false) {
       setInit(true);
-      console.log('prevForm', prevForm);
       if (prevForm != null && prevForm.currentMessage) {
         setMessages(prevForm.messages);
         setCurrentMessage(prevForm.currentMessage);
@@ -693,19 +659,11 @@ const ChatForm = ({
 
   const EditPrevChat = async i => {
     // dispatch(setBotType('Welcome'));
-    console.log(`getChatBubbleIndex ${i}`, i);
-    console.log('if EditPrevChat ', messages.length);
-    console.log('if EditChat messages', messages[i].currentMessageType);
-    //console.log(`getChatBubbleIndex ${i-2}`,i-2);
     let key = Math.floor(i / 2);
-    //console.log(`getChatBubbleIndex key`,key);
     let currentMessageKey = messages[i].currentMessageType;
-    console.log(currentMessageKey);
     setMessages(messages.splice(0, i - 1));
     nextMessage(currentMessageKey);
-    setTimeout(() => {
-      console.log(JSON.stringify(messages, null, '\t'));
-    }, 2000);
+    setTimeout(() => {}, 2000);
   };
 
   const getChatBubbleIndex = i => {
@@ -715,7 +673,7 @@ const ChatForm = ({
       [
         {
           text: 'Cancel',
-          onPress: () => console.log('close alert'),
+          onPress: () => {},
         },
         {text: 'Okay', onPress: () => EditPrevChat(i)},
       ],
@@ -741,32 +699,18 @@ const ChatForm = ({
         <VStack flex={1} py={5} ref={c => (content = c)}>
           {/* Shows chats */}
           {/* can render inputs */}
-          {messages.map((message, index) => {
+          {messages?.map((message, index) => {
             return (
-              <PresenceTransition
-                visible={true}
-                initial={{
-                  opacity: 0,
-                  translateY: -10,
-                }}
-                animate={{
-                  opacity: 1,
-                  translateY: 0,
-                  transition: {
-                    duration: 250,
-                  },
-                }}>
-                <ChatBubble
-                  profile={profile}
-                  chatBubbleIndex={index}
-                  chatBubbleColor={chatBubbleColor}
-                  isImage={!!message.image}
-                  key={index}
-                  messageText={message.text}
-                  received={message.received}>
-                  {message.text}
-                </ChatBubble>
-              </PresenceTransition>
+              <ChatBubble
+                profile={profile}
+                chatBubbleIndex={index}
+                chatBubbleColor={chatBubbleColor}
+                isImage={!!message.image}
+                key={index}
+                messageText={message.text}
+                received={message.received}>
+                {message.text}
+              </ChatBubble>
             );
           })}
 
@@ -776,48 +720,42 @@ const ChatForm = ({
 
           {/* message options */}
           {currentMessage && !showloadchatbubble && (
-            <PresenceTransition
-              visible={currentMessage ? true : false}
-              initial={opacity.initial}
-              animate={opacity.animate}>
-              <Button.Group
-                direction="column"
-                space={0}
-                p={2}
-                rounded={'3xl'}
-                marginBottom={10}>
-                {currentMessage.type === 'options' &&
-                  currentMessage.options.map((option, index) => {
-                    return (
-                      <VStack>
-                        <Button
-                          variant={'ghost'}
-                          onPress={() => {
-                            const result = onValue(
-                              currentMessage.key,
-                              option.text,
-                            );
-                            console.log(result, currentMessage.key);
-                            sendMessage(result, false, currentMessage.key);
-                            loadChatBubbleOnpress(option.next);
-                            // setCurrentMessage(null);
-                          }}
-                          my={1}>
-                          <Text
-                            style={{
-                              color: 'white',
-                              fontSize: 14,
-                              textAlign: 'center',
-                            }}>
-                            {option.text}
-                          </Text>
-                        </Button>
-                        <Divider bg={'blueGray.600'} />
-                      </VStack>
-                    );
-                  })}
-              </Button.Group>
-            </PresenceTransition>
+            <Button.Group
+              direction="column"
+              space={0}
+              p={2}
+              rounded={'3xl'}
+              marginBottom={10}>
+              {currentMessage?.type === 'options' &&
+                currentMessage?.options?.map((option, index) => {
+                  return (
+                    <VStack key={index}>
+                      <Button
+                        variant={'ghost'}
+                        onPress={() => {
+                          const result = onValue(
+                            currentMessage.key,
+                            option.text,
+                          );
+                          sendMessage(result, false, currentMessage.key);
+                          loadChatBubbleOnpress(option.next);
+                          // setCurrentMessage(null);
+                        }}
+                        my={1}>
+                        <Text
+                          style={{
+                            color: 'white',
+                            fontSize: 14,
+                            textAlign: 'center',
+                          }}>
+                          {option.text}
+                        </Text>
+                      </Button>
+                      <Divider bg={'blueGray.600'} />
+                    </VStack>
+                  );
+                })}
+            </Button.Group>
           )}
         </VStack>
       </ScrollView>
@@ -999,11 +937,5 @@ const ChatForm = ({
   );
 };
 
-const stateToProps = state => {
-  return {
-    profile: state.user.profile,
-  };
-};
-
-export default connect(stateToProps)(ChatForm);
+export default ChatForm;
 // export default ChatForm;

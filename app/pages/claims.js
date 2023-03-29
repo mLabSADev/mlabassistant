@@ -51,12 +51,12 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
       //nightSpentYes: formValues['nightSpentYes'].location,
       complete: true,
     };
-    // console.log(data);
+    //  (data);
     return data;
     // updateCV('BusinessProfile', data);
   };
   useEffect(() => {
-    console.log('<--------- isFocused ---------->');
+    ('<--------- isFocused ---------->');
   }, []);
   return (
     <KeyboardAvoidingView
@@ -171,7 +171,7 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                   break;
                 case 'finish':
                   update().then(res => {
-                    console.log('resxX', res);
+                    'resxX', res;
                   });
 
                   // const latOwnVehicle = data.startAddress.lat;
@@ -190,10 +190,10 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                   //       '',
                   //     );
                   //     const add = parseInt(distanceFix).toFixed(2);
-                  //     console.log('distance', `R${add * 4.18}`);
+                  //      ('distance', `R${add * 4.18}`);
                   //     kmTotal = add * 4.18;
                   //     nightSpent = data.nightSpentYes;
-                  //     console.log('nightSpent', `R${nightSpent * 150}`);
+                  //      ('nightSpent', `R${nightSpent * 150}`);
                   //   })
 
                   //   .finally(() => {
@@ -227,23 +227,18 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
             onValue={(key, value) => {
               setFormValues(values => {
                 values[key] = value;
-                console.log({key});
-                console.log('qwert', values[key]);
+                ({key});
+                'qwert', values[key];
                 // if (key === 'greeting' && values[key] === 'Leave') {
-                //   console.log('true is leave');
+                //    ('true is leave');
                 // navigation.navigate('Leave');
                 // }
                 // if (key === 'locationSelected') {
-                //   console.log('true is leave');
+                //    ('true is leave');
                 //   navigation.navigate('Leave');
                 // }
 
                 if (key === 'destination') {
-                  console.log('asdasdasd loog', values['startAddress'].link);
-                  console.log(
-                    'asdasdasd loog',
-                    values['startAddress'].location.lat,
-                  );
                   const latOwnVehicle = values['startAddress'].location.lat;
                   const lngOwnVehicle = values['startAddress'].location.lng;
                   const latDestination = values['destination'].location.lat;
@@ -261,10 +256,10 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                           '',
                         );
                       const add = parseInt(distanceFix).toFixed(2);
-                      console.log('distance', `R${add * 4.18}`);
+                      'distance', `R${add * 4.18}`;
                       kmTotal = add * 4.18;
                       nightSpent = data.nightSpentYes;
-                      console.log('nightSpent', `R${nightSpent * 150}`);
+                      'nightSpent', `R${nightSpent * 150}`;
                     })
 
                     .finally(() => {
@@ -298,7 +293,7 @@ const ClaimsPage = ({navigation, profile, updateCV, route}) => {
                     'DD/MM/YYYY',
                   ).format('YYYY-MM-DD');
 
-                  console.log(getDaysDiff(StartDatetest, EndDatetest));
+                  getDaysDiff(StartDatetest, EndDatetest);
                   const days = getDaysDiff(StartDatetest, EndDatetest);
                   setNumberOfLeaveDays(days);
                   setleaveType(false);

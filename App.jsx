@@ -25,7 +25,7 @@ export default function App() {
     composeEnhancers(applyMiddleware(thunkMiddleware)),
   );
   // Check auth state on first run
-  store.dispatch(onAuthStateChange());
+  // store.dispatch(onAuthStateChange());
   // store.dispatch(requestCurrentUser())
 
   return (

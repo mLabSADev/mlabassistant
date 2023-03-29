@@ -42,7 +42,7 @@ const LeaveForm = ({upload, camera, message}) => {
   const user = useSelector(state => state.account);
   let scrollViewRef = React.useRef();
   const handleContentSizeChange = () => {
-    console.log(scrollViewRef);
+    scrollViewRef;
     // scrollViewRef.current.scrollToEnd({animated: true});
   };
   const pushBotChat = () => {
@@ -64,38 +64,38 @@ const LeaveForm = ({upload, camera, message}) => {
         skipBackup: true,
       },
     };
-    console.log('Image uploaded start!');
+    ('Image uploaded start!');
     launchImageLibrary(options, async response => {
       if (response.didCancel) {
-        console.log('User cancelled image picker');
+        ('User cancelled image picker');
         // dispatch(hideLoading());
       } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
+        'ImagePicker Error: ', response.error;
         // dispatch(hideLoading());
       } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
+        'User tapped custom button: ', response.customButton;
         // dispatch(hideLoading());
       } else {
-        console.log(response);
-        console.log(response.assets[0].uri);
+        response;
+        response.assets[0].uri;
         setSelectedImage({
           fileName: response.assets[0].fileName,
           uri: response.assets[0].uri,
         });
 
         // const result = onValue(currentMessage.key, response.assets[0].uri);
-        // console.log(result);
+        //  (result);
         // sendImage(result, false, currentMessage.key);
         // await storage()
         //   .ref(`businessLogo/${profile.uid}/`)
         //   .putFile(response.uri)
         //   .then(async () => {
-        //     console.log('Image uploaded to the bucket!');
+        //      ('Image uploaded to the bucket!');
         //     await storage()
         //       .ref(`businessLogo/${profile.uid}/`)
         //       .getDownloadURL()
         //       .then((res) => {
-        //         console.log(res);
+        //          (res);
         //         const result = onValue(currentMessage.key, res);
         //         sendImage(result, false, currentMessage.key);
         //         dispatch(hideLoading());
@@ -108,7 +108,11 @@ const LeaveForm = ({upload, camera, message}) => {
     // dispatch(hideLoading())
   };
   const UserSignIn = async () => {
-    GoogleSignin.configure();
+    GoogleSignin.configure({
+      webClientId:
+        '850465646909-2cfodnp5aquup07hi3kdiblasrr97bqg.apps.googleusercontent.com',
+      offlineAccess: false,
+    });
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
     dispatch(
@@ -123,15 +127,15 @@ const LeaveForm = ({upload, camera, message}) => {
   React.useEffect(() => {
     for (const key in BotQuestions) {
       if (BotQuestions[key].type === 'options') {
-        // console.log('options');
+        //  ('options');
       } else if (BotQuestions[key].type === 'question') {
-        // console.log('question');
+        //  ('question');
       } else {
-        // console.log(BotQuestions[key]);
+        //  (BotQuestions[key]);
       }
     }
 
-    // console.log(BotQuestions[botKey]);
+    //  (BotQuestions[botKey]);
     setChats([]);
     pushBotChat();
   }, []);
@@ -145,7 +149,7 @@ const LeaveForm = ({upload, camera, message}) => {
           }}
           ref={data => {
             scrollViewRef = data;
-            console.log(scrollViewRef);
+            scrollViewRef;
           }}
           flex={1}
           contentContainerStyle={{
@@ -154,13 +158,13 @@ const LeaveForm = ({upload, camera, message}) => {
             paddingHorizontal: 10,
           }}>
           {chats.map((item, i) => {
-            console.log(item);
+            item;
             const options = item.options || [];
             return (
               <BotBubble
                 key={i}
                 onPress={e => {
-                  console.log(e);
+                  e;
                 }}
                 text={item.content}
                 options={options}
@@ -248,7 +252,7 @@ const LeaveForm = ({upload, camera, message}) => {
                 onPress={() => {
                   setChats(prev => [...prev, inputText]);
                   setInputText('');
-                  // console.log(scrollViewRef);
+                  //  (scrollViewRef);
                 }}
                 size={51}
                 endIcon={<Icon name={'send'} size={16} color={'white'} />}
