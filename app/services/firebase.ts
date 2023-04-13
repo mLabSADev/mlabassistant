@@ -9,41 +9,25 @@ GoogleSignin.configure({
 });
 
 export async function signInWithGoogle() {
-  return new Promise(async (resolve, reject) => {
-    await GoogleSignin.signIn().then(async (res) => {
+  console.log('Signin G');
 
-      const googleCredential = auth.GoogleAuthProvider.credential(res.idToken);
-      await auth().signInWithCredential(googleCredential).then(async (authdata) => {
-        var uid;
-        await auth().onAuthStateChanged(async (user) => {
-          if (user) {
-            uid = user?.uid
-            // Signed in
-          } else {
-            // Signed out
-          }
-        })
-        resolve({ message: authdata, error: `success` });
-        //   }
-        // })
-      })
-    })
-      .catch((error) => {
-        resolve({ message: error.message, error: undefined });
-      });
+  return new Promise(async (resolve, reject) => {
+    const hasPlay = await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    console.log('signin >> ', hasPlay);
+
+    const { idToken } = await GoogleSignin.signIn();
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    const user = await (await auth().signInWithCredential(googleCredential)).user
+    resolve({ message: user, error: `success` });
   })
 }
 
 export async function onAuthStateChangefirebase() {
-
-
   return new Promise((resolve, reject) => {
     return auth()
       .onAuthStateChanged(async (user) => {
-
         if (user) {
           resolve(user);
-          // await mongoAuth()
         } else {
           resolve(null);
         }

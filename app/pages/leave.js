@@ -26,62 +26,25 @@ import ChatForm from '../components/chat-form';
 import {connect, useDispatch, useSelector} from 'react-redux';
 import {ChatBotName} from '../assets/app-consts';
 import {LocationService} from '../services/location-service';
-import {signIn} from '../redux/userAccountSlice';
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-const LeavePage = ({navigation, updateCV, route}) => {
-  const user = {
-    profile: {},
-    isLoggedIn: false,
-  };
-
+import {googleSignIn, onAuthStateChange} from '../redux/user-async-action';
+const LeavePage = ({navigation, updateCV, route, userProfile}) => {
   var data = {};
+  const dispatch = useDispatch();
   const [formValues, setFormValues] = useState({});
   const leaveDocument = firestore().collection('Leave');
   const [messages, setMessages] = useState([]);
   const [name, setName] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [profile, setProfile] = useState({});
   const toast = useToast();
-
-  const UserSignIn = async () => {
-    try {
-      GoogleSignin.configure({
-        webClientId:
-          '850465646909-2cfodnp5aquup07hi3kdiblasrr97bqg.apps.googleusercontent.com',
-        offlineAccess: false,
-      });
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      setProfile(userInfo.user);
-      setIsLoggedIn(true);
-      toast.show({title: 'Signed in'});
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        toast.show({title: 'Sign-in Cancelled'});
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        toast.show({title: 'Sign-in in Progress'});
-        await GoogleSignin.signInSilently();
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        toast.show({
-          title: 'Sign-in failed',
-          description: 'Play service not available',
-        });
-        // play services not available or outdated
-      } else {
-        toast.show({title: 'Signin Failed', description: error.message});
-        await GoogleSignin.signInSilently();
-        // some other error happened
-      }
-    }
-  };
+  const {profile, isLoggedIn, isLoading} = useSelector(state => state.user);
   React.useEffect(() => {
-    UserSignIn();
+    if (!isLoggedIn) {
+      dispatch(googleSignIn());
+    }
   }, []);
   return (
     <KeyboardAvoidingView style={{flex: 1}}>
@@ -110,7 +73,11 @@ const LeavePage = ({navigation, updateCV, route}) => {
                 </Text>
               )}
             </Box>
-            {name ? <Text>{name}</Text> : <Text>Welcome</Text>}
+            {profile?.displayName ? (
+              <Text>{profile.displayName}</Text>
+            ) : (
+              <Text>Welcome</Text>
+            )}
           </HStack>
 
           <ChatForm
@@ -127,14 +94,14 @@ const LeavePage = ({navigation, updateCV, route}) => {
                 case 'thankyou':
                   break;
                 case 'finish':
-                  'ChatForm > onAction > switch > finish';
-
                   if (isLoggedIn) {
-                    ('finish > loggedIn');
                     const data = {
-                      user: profile || {},
+                      user:
+                        {name: profile?.displayName, email: profile?.email} ||
+                        {},
                       messages: chats || [],
                     };
+                    console.log(data);
                     leaveDocument
                       .add(data)
                       .then(res => {
@@ -158,9 +125,7 @@ const LeavePage = ({navigation, updateCV, route}) => {
                         });
                       });
                   } else {
-                    ('Finish > noUser');
-                    ('no Profile');
-                    UserSignIn();
+                    dispatch(onAuthStateChange());
                   }
                   break;
               }
@@ -185,7 +150,7 @@ const stateToProps = state => {
     profile: state.user.profile,
   };
 };
-export default LeavePage;
+export default connect(stateToProps)(LeavePage);
 
 let ScreenHeight = Dimensions.get('window').height;
 let ScreenHeightHalf = Dimensions.get('window').height / 1.5;

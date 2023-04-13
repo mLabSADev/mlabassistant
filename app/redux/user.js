@@ -1,5 +1,9 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import {
   onAuthStateChange,
   logOut,
   googleSignIn,
@@ -11,65 +15,47 @@ const user = createSlice({
     userId: null,
     isLoading: false,
     isLoggedIn: false,
+    error: {
+      message: '',
+      state: false,
+    },
   },
   extraReducers: builder => {
     // update state depending on resonse
     builder.addCase(onAuthStateChange.fulfilled, (state, {payload}) => {
-      ('builder.addCase > onAuthStateChanged > fulfilled');
-      if (payload === undefined) {
-        `No user`;
+      if (!payload) {
         return {
           ...state,
           isLoading: false,
         };
       } else {
-        `User > onAuthStateChange.fulfilled > else` + payload.uid;
         return {
           profile: payload,
-          userId: payload.uid,
+          userId: payload?.uid,
           isLoading: false,
           isLoggedIn: true,
         };
       }
     });
     builder.addCase(onAuthStateChange.pending, (state, {payload}) => {
-      'it pending', payload;
       return {...state, isLoading: true};
     });
     builder.addCase(onAuthStateChange.rejected, (state, {payload}) => {
-      'it rejected', payload;
       return {...state, isLoading: false};
     });
     builder.addCase(logOut.fulfilled, (state, {payload}) => {
-      'it fulfilled logOut', payload;
       return {
         ...state,
-        profile: {
-          firstname: undefined,
-          lastname: undefined,
-          interest: undefined,
-          location: undefined,
-          email: undefined,
-          gender: undefined,
-          dob: undefined,
-          profilepicture: undefined,
-          phoneNumber: undefined,
-          coordinates: undefined,
-          notifications: undefined,
-          cvUrl: undefined,
-          uid: undefined,
-        },
+        profile: {},
         isLoading: false,
         isLoggedIn: false,
       };
     });
     builder.addCase(googleSignIn.fulfilled, (state, {payload}) => {
-      'builder case > GoogleSignIn > fulfilled', state;
-      //  ('it fulfilled', payload);
-      state.profile;
       if (payload.error === 'success') {
         return {
           ...state,
+          profile: payload,
           isLoading: false,
           isLoggedIn: true,
         };
@@ -88,11 +74,11 @@ const user = createSlice({
       }
     });
     builder.addCase(googleSignIn.pending, (state, {payload}) => {
-      'it pending', payload;
+      console.log('signin pending');
       return {...state, isLoading: false};
     });
     builder.addCase(googleSignIn.rejected, (state, {payload}) => {
-      'it rejected', payload;
+      console.log('signin failed');
       return {...state, isLoading: false};
     });
   },

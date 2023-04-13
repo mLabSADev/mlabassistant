@@ -1,6 +1,6 @@
 import React from 'react';
 import reducers from './app/redux/reducers';
-import {createStore, applyMiddleware} from 'redux';
+import {createStore, applyMiddleware, compose} from 'redux';
 import {Provider} from 'react-redux';
 import {composeWithDevTools} from 'remote-redux-devtools';
 import thunkMiddleware from 'redux-thunk';
@@ -13,20 +13,16 @@ import {onAuthStateChange} from './app/redux/user-async-action';
 import {NativeBaseTheme} from './app/theme/colors';
 
 export default function App() {
+  const middleWare = [thunkMiddleware];
   const composeEnhancers = composeWithDevTools({
     realtime: true,
     // hostname: '192.168.8.20',
     hostname: '192.168.0.102',
     port: 8000,
   }); // Change IP address to your machine's IP address if you would like to use devtools
-  const store = createStore(
-    reducers,
-    {},
-    composeEnhancers(applyMiddleware(thunkMiddleware)),
-  );
+  const store = createStore(reducers, compose(applyMiddleware(...middleWare)));
   // Check auth state on first run
-  // store.dispatch(onAuthStateChange());
-  // store.dispatch(requestCurrentUser())
+  store.dispatch(onAuthStateChange());
 
   return (
     <NativeBaseProvider theme={NativeBaseTheme}>

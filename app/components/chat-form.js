@@ -191,7 +191,7 @@ const ChatForm = ({
 
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
-  const botType = useSelector(state => state);
+  const botType = useSelector(state => state.app.botType);
   //
   const locationSelected = location => {
     const link =
@@ -294,22 +294,18 @@ const ChatForm = ({
     } else if (key === 'claims') {
       dispatch(setBotType(key));
     }
-    const message = key === 'leave' ? [key] : claims[key];
+    // const message = botType === 'claims' ? claims[key] : leave[key];
+    const message = claims[key];
 
     // 2 push key data
-    messagesKey.push(key);
-    setMessagesKey(messagesKey);
+    setMessagesKey(prev => [...prev, key]);
 
     // stop if no message...
-    if (message == null) {
-      return;
-    }
+    if (message == null) return;
+
     // set active current message
     // message = entire 'greeting: {}' obj + key = 'greeting' (index)
-    setCurrentMessage({
-      ...message,
-      key: key,
-    });
+    setCurrentMessage({...message, key: key});
 
     if (message.type == 'action') {
       if (onAction != null) {
